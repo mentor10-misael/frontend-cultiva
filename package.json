@@ -1,0 +1,27 @@
+{
+  "name": "frontend-cultiva",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "lite-server --port 3001",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mentor10-misael/frontend-cultiva.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mentor10-misael/frontend-cultiva/issues"
+  },
+  "homepage": "https://github.com/mentor10-misael/frontend-cultiva#readme",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.13.5"
+  },
+  "devDependencies": {
+    "lite-server": "^2.6.1"
+  }
+}

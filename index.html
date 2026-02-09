@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Frontend Cultiva - Bootcamp</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-light">
+    <div class="container py-5">
+      <div class="card shadow-sm">
+        <div class="card-body text-center">
+          <h1 class="card-title mb-4">Bem-vindo ao Cultiva</h1>
+          <p class="card-text text-muted">
+            A aplicação frontend está configurada com Bootstrap e Axios.
+          </p>
+          <div id="status" class="alert alert-info">
+            Status da API: <span id="api-message">Carregando...</span>
+          </div>
+          <p class="text-muted small">A requisição é feita automaticamente ao abrir a página, para garantir que a api está respondendo.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Axios -->
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- App Logic -->
+    <script src="index.js"></script>
+  </body>
+</html>
