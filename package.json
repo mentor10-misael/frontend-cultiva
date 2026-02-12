@@ -19,7 +19,8 @@
   "homepage": "https://github.com/mentor10-misael/frontend-cultiva#readme",
   "description": "",
   "dependencies": {
-    "axios": "^1.13.5"
+    "axios": "^1.13.5",
+    "bootstrap": "^5.3.8"
   },
   "devDependencies": {
     "lite-server": "^2.6.1"
