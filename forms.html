@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+    <header>
+        <h1 class="title-form">Nova Movimentação</h1>
+        <p class="description-form">Registre uma entrada ou saída financeira</p>
+    </header>
+    <main>
+        <section class="choose-operation">
+            <div class="input">
+                <i class="bi bi-arrow-up-circle icon-operation"></i>
+                <p>Entrada</p>
+            </div>
+            <div class="output">
+                <i class="bi bi-arrow-down-circle icon-operation"></i>
+                <p>Saída</p>
+            </div>
+        </section>
+        <section class="form-section">
+            <form class="row g-3 form">
+                <div class="col-12">
+                    <label for="inputAddress" class="form-label">Valor</label>
+                    <input type="text" class="form-control" id="inputAddress" placeholder="R$ 0,00">
+                </div>
+                <div class="col-12">
+                    <label for="inputAddress2" class="form-label">Descrição</label>
+                    <input type="text" class="form-control" id="inputAddress2" placeholder="Ex: Venda de Soja">
+                </div>
+                <div class="col-md-6">
+                    <label for="inputEmail4" class="form-label">Data</label>
+                    <div class="input-pay">
+                        <i class="bi bi-calendar4"></i>
+                        <input type="email" class="form-control" id="inputEmail4">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label for="inputPassword4" class="form-label">Forma de Pagamento</label>
+                    <div class="input-pay">
+                        <i class="bi bi-credit-card"></i>
+                        <input type="password" class="form-control" id="inputPassword4">
+                    </div>
+                </div>
+                <div class="col-12">
+                    <label for="inputAddress2" class="form-label">Quem pagou?</label>
+                    <div class="input-person">
+                        <i class="bi bi-person"></i>
+                        <input type="text" class="form-control" id="inputAddress2" placeholder="Ex: Cooperativa, Cliente Final...">
+                    </div>
+                </div>
+                
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-form">Registrar Entrada</button>
+                </div>
+            </form>
+        </section>
+    </main>
+    <script src="https://kit.fontawesome.com/c7ba1f85d3.js" crossorigin="anonymous"></script>
+</body>
+</html>
