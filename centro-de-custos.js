@@ -5,11 +5,12 @@ function toggleForm(tipo) {
   const infoGeral = document.getElementById("infoGeral");
   const inputNome = document.getElementById("inputNome");
 
+  // Oculta os blocos antes de exibir o selecionado
   camposLavoura.classList.add("d-none");
   camposMaquinas.classList.add("d-none");
   infoGeral.classList.add("d-none");
 
-  // Lógica de exibição
+  // Exibe os campos conforme o tipo escolhido
   if (tipo === "lavoura") {
     camposLavoura.classList.remove("d-none");
     inputNome.placeholder = "Ex: Terreno do Rio";
@@ -22,10 +23,9 @@ function toggleForm(tipo) {
   }
 }
 
-// 2. Lógica de Filtros (Milho/Máquinas/Geral)
+//Lógica de Filtros (Milho/Máquinas/Geral)
 function filtrarCategoria(categoria, nomeExibicao, elementoCard) {
-
-    document.querySelectorAll(".card-cost-center").forEach((card) => {
+  document.querySelectorAll(".card-cost-center").forEach((card) => {
     card.classList.remove("active");
   });
   if (elementoCard) {
