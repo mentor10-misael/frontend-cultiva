@@ -131,9 +131,8 @@
           <h6 class="fw-bold m-0 text-dark">Centros de Custo</h6>
           <a
             href="javascript:void(0)"
-            onclick="limparFiltro()"
             id="btnLimparFiltro"
-            class="text-decoration-none text-success fs-xs d-none"
+            class="text-decoration-none ... d-none"
           >
             Limpar filtro <i class="fa-solid fa-xmark"></i>
           </a>
@@ -155,7 +154,8 @@
 
           <div
             class="card flex-shrink-0 card-cost-center cursor-pointer"
-            onclick="filtrarCategoria('milho', 'Milho', this)"
+            data-categoria="milho"
+            data-nome="Milho"
           >
             <div
               class="card-body p-2 d-flex flex-column justify-content-between"
@@ -169,12 +169,10 @@
               </div>
             </div>
           </div>
-
           <div
             class="card flex-shrink-0 card-cost-center cursor-pointer"
-            onclick="
-              filtrarCategoria('maquinas', 'Máquinas e Equipamentos', this)
-            "
+            data-categoria="maquinas"
+            data-nome="Máquinas e Equipamentos"
           >
             <div
               class="card-body p-2 d-flex flex-column justify-content-between"
@@ -202,17 +200,19 @@
         </div>
 
         <div class="input-group mb-3 shadow-sm">
-          <span class="input-group-text bg-white border-end-0"
-            ><i class="fa-solid fa-magnifying-glass text-muted"></i
-          ></span>
+          <span class="input-group-text bg-white border-end-0">
+            <i class="fa-solid fa-magnifying-glass text-muted"></i>
+          </span>
           <input
             type="text"
+            id="inputBusca"
             class="form-control border-start-0 ps-0 search-input"
             placeholder="Buscar..."
           />
           <button
             class="btn btn-white border border-start-0 text-muted"
             type="button"
+            id="btnLimparBusca"
           >
             Limpar
           </button>
