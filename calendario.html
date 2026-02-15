@@ -10,14 +10,43 @@
   <link rel="stylesheet" href="./style.css">
 </head>
 
-<body>
-  <header class="fixed-top d-flex p-2 justify-content-between align-items-center border-bottom border-3">
+<body class="p-3">
+  <header class="fixed-top d-flex p-3 justify-content-between align-items-center border-bottom border-3">
     <div>
       <span class="text-segundary">Olá,</span>
       <h2>Administrador</h2>
     </div>
     <button class="d-flex align-items-center gap-2" style="background: none; border: none;"><i class="bi bi-person-circle rounded-circle button-profile"></i><i class="bi bi-chevron-down text-secondary"></i></button>
   </header>
+  <main class="mt-5 pt-5 mb-5 pt-5">
+    <section>
+      <div class="d-flex gap-3 mb-3">
+        <i class="bi bi-calendar4" style="font-size: 1.5rem;"></i>
+        <h2>Agenda do Dia</h2>
+      </div>
+      <div class="card border-2 shadow-sm rounded-4">
+        <div class=" card-body d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-3 p-2">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="opcao" id="opcao1" style="width: 25px; height: 25px;">
+            </div>
+            <div>
+              <h5 class=" card-title">Aplicar inseticida</h5>
+              <div class="card-text p- d-inline-block" style="background: #EFF6FF; border-radius: 49px; color: #155DFC;">
+                <i class="bi bi-clock "></i>
+                <span>
+                  18:57
+                </span>
+              </div>
+            </div>
+          </div>
+          <button class="btn ">
+            <i class="bi bi-three-dots-vertical" style="font-size: 2rem;"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
   <footer class="fixed-bottom border-top border-2">
     <nav>
       <ul class="list-unstyled d-flex justify-content-around m-0 p-2">
