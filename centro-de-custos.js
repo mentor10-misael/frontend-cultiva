@@ -1,131 +1,155 @@
-// 1. CAMADA DE DADOS
+// ==========================================
+// 1. CAMADA DE DADOS (Repository & Sync)
+// ==========================================
 
-const MockBackendService = {
-    // Chaves para salvar no navegador
+// Simula sua API na nuvem (Node.js) e faz a tradução para o formato do Banco SQL
+const FakeCloudAPI = {
+    enviarTransacao: (transacaoFront) => {
+        return new Promise((resolve, reject) => {
+            // Simula delay de rede de 1 segundo
+            setTimeout(() => {
+                // 1. Tradução para o formato do seu Banco de Dados (Diagrama)
+                const payloadBanco = {
+                    tipo: transacaoFront.tipo === 'entrada' ? 'RECEITA' : 'DESPESA',
+                    descricao: transacaoFront.descricao,
+                    valor: transacaoFront.valor,
+                    data: transacaoFront.data,
+                    forma_pagamento: transacaoFront.pagamento, // Campo novo
+                    beneficiario: transacaoFront.pessoa,       // Campo novo
+                    centro_custo_id: transacaoFront.categoria, // Slug (ideal seria ID UUID)
+                    usuario_id: 1
+                };
+
+                console.log(`[CLOUD] Sincronizando:`, payloadBanco);
+
+                // Simula 10% de chance de erro na rede
+                if (Math.random() > 0.95) reject("Erro de conexão simulado");
+                else resolve({ status: 'ok', idServer: Date.now() });
+            }, 1000);
+        });
+    }
+};
+
+const Repository = {
     KEY_TRANSACOES: 'cultiva_transacoes',
     KEY_CATEGORIAS: 'cultiva_categorias',
 
-    dadosIniciaisTransacoes: [], //Vazio, pro agricultor registrar os dados
-
+    // Dados iniciais (Seed)
     dadosIniciaisCategorias: [
         { slug: 'lavoura', nome: 'Lavoura (Geral)', tipo: 'lavoura' },
         { slug: 'maquinas', nome: 'Máquinas', tipo: 'maquinas' },
         { slug: 'geral', nome: 'Despesas Gerais', tipo: 'geral' }
     ],
 
-    // Carrega do LocalStorage ou usa os iniciais
-    database: [],
-    categorias: [],
+    getAllTransacoes: () => JSON.parse(localStorage.getItem('cultiva_transacoes')) || [],
+    getAllCategorias: () => JSON.parse(localStorage.getItem('cultiva_categorias')) || [],
 
     init: function() {
-        const transacoesSalvas = localStorage.getItem(this.KEY_TRANSACOES);
-        const categoriasSalvas = localStorage.getItem(this.KEY_CATEGORIAS);
-
-        if (transacoesSalvas) {
-            this.database = JSON.parse(transacoesSalvas);
-        } else {
-            // Se não tem nada salvo, pega o array vazio que foi definido acima
-            this.database = this.dadosIniciaisTransacoes;
-            this.salvarLocal(); 
+        if (!localStorage.getItem(this.KEY_CATEGORIAS)) {
+            localStorage.setItem(this.KEY_CATEGORIAS, JSON.stringify(this.dadosIniciaisCategorias));
         }
-
-        if (categoriasSalvas) {
-            this.categorias = JSON.parse(categoriasSalvas);
-        } else {
-            this.categorias = this.dadosIniciaisCategorias;
-            this.salvarCategoriasLocal();
+        if (!localStorage.getItem(this.KEY_TRANSACOES)) {
+            localStorage.setItem(this.KEY_TRANSACOES, JSON.stringify([]));
         }
     },
-    
-    salvarLocal: function() {
-        localStorage.setItem(this.KEY_TRANSACOES, JSON.stringify(this.database));
-    },
 
-    salvarCategoriasLocal: function() {
-        localStorage.setItem(this.KEY_CATEGORIAS, JSON.stringify(this.categorias));
-    },
-
-    //MÉTODOS DE API
-
-    getDashboardData: function(filtroCategoria = 'todos', termoBusca = '') {
-        // Garante que carregou os dados
-        if (this.database.length === 0 && this.categorias.length === 0) this.init();
-
-        let totalReceitas = 0;
-        let totalDespesas = 0;
+    salvarTransacao: function(transacao) {
+        const transacoes = this.getAllTransacoes();
         
-        this.database.forEach(t => {
-            if (t.tipo === 'entrada') totalReceitas += t.valor;
-            else totalDespesas += t.valor;
-        });
-
-        const mapaCentros = {};
-        this.categorias.forEach(cat => {
-            mapaCentros[cat.slug] = {
-                slug: cat.slug, nome: cat.nome, tipo: cat.tipo, saldo: 0
-            };
-        });
+        // Se já existe (edição), substitui. Se não, adiciona no começo.
+        const index = transacoes.findIndex(t => t.id === transacao.id);
         
-        this.database.forEach(t => {
-            if (mapaCentros[t.categoria]) {
-                if (t.tipo === 'entrada') mapaCentros[t.categoria].saldo += t.valor;
-                else mapaCentros[t.categoria].saldo -= t.valor;
-            }
-        });
-
-        const transacoesFiltradas = this.database.filter(t => {
-            const passaFiltroCat = filtroCategoria === 'todos' || t.categoria === filtroCategoria;
-            const passaBusca = termoBusca === '' || 
-                               t.descricao.toLowerCase().includes(termoBusca) || 
-                               t.pessoa.toLowerCase().includes(termoBusca);
-            return passaFiltroCat && passaBusca;
-        });
-
-        transacoesFiltradas.sort((a, b) => new Date(b.data) - new Date(a.data));
-
-        return {
-            resumo: { totalReceitas, totalDespesas, saldo: totalReceitas - totalDespesas },
-            centrosDeCusto: Object.values(mapaCentros),
-            transacoes: transacoesFiltradas,
-            todasCategorias: this.categorias
-        };
-    },
-
-    adicionarTransacao: function(transacao) {
-        if (this.database.length === 0) this.init();
-        transacao.id = Date.now();
-        // Marca como pendente de sincronização
+        // Configura flags de sincronização
+        transacao.updatedAt = new Date().toISOString();
         transacao.syncStatus = 'pendente'; 
-        this.database.unshift(transacao);
-        this.salvarLocal();
+
+        if (index !== -1) {
+            transacoes[index] = transacao;
+        } else {
+            transacoes.unshift(transacao);
+        }
+
+        localStorage.setItem(this.KEY_TRANSACOES, JSON.stringify(transacoes));
+        
+        // Tenta sincronizar imediatamente se estiver online
+        SyncService.tentarSincronizar();
+        return transacoes;
     },
 
-    atualizarTransacao: function(transacaoAtualizada) {
-        const index = this.database.findIndex(t => t.id === transacaoAtualizada.id);
+    atualizarStatusSync: function(id, status) {
+        const transacoes = this.getAllTransacoes();
+        const index = transacoes.findIndex(t => t.id === id);
         if (index !== -1) {
-            transacaoAtualizada.syncStatus = 'pendente';
-            this.database[index] = transacaoAtualizada;
-            this.salvarLocal(); 
+            transacoes[index].syncStatus = status;
+            localStorage.setItem(this.KEY_TRANSACOES, JSON.stringify(transacoes));
         }
     },
 
     removerTransacao: function(id) {
-        this.database = this.database.filter(t => t.id !== id);
-        this.salvarLocal(); // 
+        let transacoes = this.getAllTransacoes();
+        // Em produção, usaríamos "soft delete" (deletedAt), aqui removemos do array
+        transacoes = transacoes.filter(t => t.id !== id);
+        localStorage.setItem(this.KEY_TRANSACOES, JSON.stringify(transacoes));
+        return transacoes;
     },
 
-    adicionarCategoria: function(nome, tipo) {
-        if (this.categorias.length === 0) this.init();
-        const slug = nome.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
-        const novaCat = { slug, nome, tipo };
-        this.categorias.push(novaCat);
-        this.salvarCategoriasLocal();
-        return novaCat;
+    adicionarCategoria: function(categoria) {
+        const categorias = this.getAllCategorias();
+        categorias.push(categoria);
+        localStorage.setItem(this.KEY_CATEGORIAS, JSON.stringify(categorias));
+        return categorias;
     }
 };
 
-// 2. CAMADA DE INTERFACE (VIEW)
+// Serviço responsável por ouvir a internet e empurrar dados
+const SyncService = {
+    isOnline: navigator.onLine,
 
+    init: function() {
+        window.addEventListener('online', () => {
+            this.isOnline = true;
+            console.log('Conexão restabelecida. Sincronizando...');
+            UI.mostrarStatusConexao(true);
+            this.tentarSincronizar();
+        });
+
+        window.addEventListener('offline', () => {
+            this.isOnline = false;
+            console.log('Sem internet. Modo Offline ativado.');
+            UI.mostrarStatusConexao(false);
+        });
+
+        // Tenta sincronizar ao abrir o app
+        if(this.isOnline) this.tentarSincronizar();
+    },
+
+    tentarSincronizar: async function() {
+        if (!this.isOnline) return;
+
+        const pendentes = Repository.getAllTransacoes().filter(t => t.syncStatus === 'pendente');
+
+        if (pendentes.length === 0) return;
+
+        UI.mostrarCarregandoSync(true);
+
+        for (const item of pendentes) {
+            try {
+                await FakeCloudAPI.enviarTransacao(item);
+                Repository.atualizarStatusSync(item.id, 'sincronizado');
+            } catch (error) {
+                console.error(`Falha ao sincronizar item ${item.id}`, error);
+            }
+        }
+        
+        UI.mostrarCarregandoSync(false);
+        UI.atualizarTela(); // Atualiza a lista para mostrar os "checks" verdes
+    }
+};
+
+
+// ==========================================
+// 2. CAMADA DE INTERFACE (VIEW)
+// ==========================================
 
 const UI = {
     elementos: {
@@ -149,7 +173,8 @@ const UI = {
     },
 
     atualizarTela: function() {
-        const dados = MockBackendService.getDashboardData(this.estado.filtroCategoria, this.estado.termoBusca);
+        // Agora pede os dados processados ao Controlador
+        const dados = Controlador.obterDadosParaTela();
 
         this.renderizarTotais(dados.resumo);
         this.renderizarCentrosDeCusto(dados.centrosDeCusto);
@@ -168,6 +193,7 @@ const UI = {
         
         container.innerHTML = ''; 
 
+        // Botão "Novo"
         const btnNovo = `
             <div class="card d-flex align-items-center justify-content-center flex-shrink-0 card-add-new"
                 data-bs-toggle="modal" data-bs-target="#modalNovoCentro">
@@ -179,11 +205,11 @@ const UI = {
         `;
         container.insertAdjacentHTML('beforeend', btnNovo);
 
+        // Lista de Cards
         listaCentros.forEach(centro => {
             const isAtivo = this.estado.filtroCategoria === centro.slug ? 'active' : '';
             const corValor = centro.saldo >= 0 ? 'text-success' : 'text-danger';
             
-            // Ícones baseados no tipo
             let icone = 'fa-layer-group';
             if (centro.tipo === 'lavoura') icone = 'fa-seedling';
             if (centro.tipo === 'maquinas') icone = 'fa-tractor';
@@ -211,14 +237,11 @@ const UI = {
         });
     },
 
-    // Atualiza o <select> do modal de nova movimentação
     atualizarDropdownCentros: function(categorias) {
         const select = this.elementos.selectCentroCusto;
         if(!select) return;
 
-        // Salva o valor atual caso esteja editando
         const valorAtual = select.value;
-
         select.innerHTML = '<option value="" disabled selected>Selecione...</option>';
         
         categorias.forEach(cat => {
@@ -228,7 +251,6 @@ const UI = {
             select.appendChild(option);
         });
 
-        // Tenta restaurar o valor selecionado
         if(valorAtual) select.value = valorAtual;
     },
 
@@ -250,17 +272,38 @@ const UI = {
             const sinal = isEntrada ? '' : '- ';
             const dataF = t.data.split('-').reverse().join('/');
 
+            // Ícone de status de sincronização
+            const iconeSync = t.syncStatus === 'pendente' 
+                ? '<i class="fa-solid fa-cloud-arrow-up text-warning ms-2" title="Pendente de envio"></i>' 
+                : '<i class="fa-solid fa-check text-success ms-2 fs-xxs" title="Sincronizado"></i>';
+
+            // Define o nome do usuário (fallback para 'Sistema' se estiver vazio)
+            const nomeUsuario = t.usuario || 'Sistema';
+
             const html = `
                 <div class="card card-transaction cursor-pointer mb-2" onclick="Controlador.abrirDetalhes(${t.id})">
                   <div class="card-body p-3 d-flex justify-content-between align-items-center ${corBorda}">
-                    <div>
-                      <div class="d-flex align-items-center gap-2 mb-1">
-                        <span class="fw-bold text-dark">${t.descricao}</span>
+                    <div class="d-flex flex-column gap-1">
+                      
+                      <div class="d-flex align-items-center gap-2">
+                        <span class="fw-bold text-dark text-truncate" style="max-width: 180px;">${t.descricao}</span>
+                        ${iconeSync}
                       </div>
-                      <div class="text-muted small text-date">${t.categoriaNome} • ${dataF}</div>
+
+                      <div class="d-flex align-items-center flex-wrap gap-2">
+                        <span class="badge bg-light text-secondary border fw-normal d-flex align-items-center px-2 py-1" style="font-size: 9px;">
+                            <i class="fa-solid fa-user fs-xxs me-1"></i> ${nomeUsuario}
+                        </span>
+                        
+                        <span class="text-muted small text-date" style="font-size: 11px;">
+                            ${t.categoriaNome} • ${dataF}
+                        </span>
+                      </div>
+
                     </div>
-                    <div class="text-end">
-                      <div class="fw-bold ${corTexto} mb-1">${sinal}${this.formatarMoeda(t.valor)}</div>
+                    
+                    <div class="text-end ps-2">
+                      <div class="fw-bold ${corTexto} mb-1 text-nowrap">${sinal}${this.formatarMoeda(t.valor)}</div>
                     </div>
                   </div>
                 </div>
@@ -289,7 +332,6 @@ const UI = {
             Controlador.salvarTransacao();
         });
 
-        //Salvar novo centro de custo
         document.getElementById('formNovoCentro')?.addEventListener('submit', (e) => {
             e.preventDefault();
             Controlador.salvarNovoCentro();
@@ -333,54 +375,150 @@ const UI = {
             btnSubmit.textContent = Controlador.idEmEdicao ? 'Salvar Alterações' : 'Registrar Saída';
             if(inputDescricao) inputDescricao.placeholder = 'Ex: Manutenção Trator';
         }
+    },
+
+    mostrarStatusConexao: function(online) {
+        const header = document.querySelector('.header-custom h3');
+        if(!header) return;
+        if(!online) {
+            header.innerHTML = `Controle de Custos <span class="badge bg-warning text-dark fs-xxs ms-2">OFFLINE</span>`;
+        } else {
+            header.innerHTML = `Controle de Custos`;
+        }
+    },
+
+    mostrarCarregandoSync: function(loading) {
+        const btn = document.getElementById('btnNovaTransacao');
+        if(!btn) return;
+        
+        if(loading) {
+            // Guarda o HTML original se não tiver guardado ainda
+            if(!btn.getAttribute('data-orig')) btn.setAttribute('data-orig', btn.innerHTML);
+            btn.innerHTML = '<i class="fa-solid fa-rotate fa-spin"></i>';
+        } else {
+            const original = btn.getAttribute('data-orig');
+            if(original) btn.innerHTML = original;
+        }
     }
 };
 
-// 3. CONTROLADOR
-
+// ==========================================
+// 3. CONTROLADOR (Lógica de Negócio)
+// ==========================================
 
 const Controlador = {
     idEmEdicao: null,
 
-    filtrarPorCategoria: function(slug, nome) {
-        UI.estado.filtroCategoria = slug;
+    init: function() {
+        Repository.init();
+        SyncService.init();
+        UI.inicializar();
+    },
+
+    // Lógica principal: Busca dados brutos e calcula o que a tela precisa
+    obterDadosParaTela: function() {
+        const todasTransacoes = Repository.getAllTransacoes();
+        const categorias = Repository.getAllCategorias();
         
-        const badge = document.getElementById("badgeFiltroAtual");
-        const btnLimpar = document.getElementById("btnLimparFiltro");
+        // 1. Filtros
+        const termo = UI.estado.termoBusca;
+        const catFiltro = UI.estado.filtroCategoria;
+
+        const transacoesFiltradas = todasTransacoes.filter(t => {
+            const passaFiltroCat = catFiltro === 'todos' || t.categoria === catFiltro;
+            // Proteção contra campos nulos no search
+            const desc = t.descricao ? t.descricao.toLowerCase() : '';
+            const pes = t.pessoa ? t.pessoa.toLowerCase() : '';
+            
+            const passaBusca = termo === '' || desc.includes(termo) || pes.includes(termo);
+            return passaFiltroCat && passaBusca;
+        });
+
+        // 2. Ordenação
+        transacoesFiltradas.sort((a, b) => new Date(b.data) - new Date(a.data));
+
+        // 3. Cálculos de Totais Gerais
+        let totalReceitas = 0;
+        let totalDespesas = 0;
+
+        todasTransacoes.forEach(t => {
+            if (t.tipo === 'entrada') totalReceitas += t.valor;
+            else totalDespesas += t.valor;
+        });
+
+        // 4. Cálculos dos Saldos por Centro de Custo
+        const centrosCalculados = categorias.map(cat => {
+            let saldo = 0;
+            todasTransacoes.forEach(t => {
+                if (t.categoria === cat.slug) {
+                    if (t.tipo === 'entrada') saldo += t.valor;
+                    else saldo -= t.valor;
+                }
+            });
+            return { ...cat, saldo };
+        });
+
+        return {
+            resumo: { totalReceitas, totalDespesas },
+            centrosDeCusto: centrosCalculados,
+            transacoes: transacoesFiltradas,
+            todasCategorias: categorias
+        };
+    },
+
+    salvarTransacao: function() {
+        const tipo = document.getElementById('inputTipoMovimentacao').value;
+        const valor = parseFloat(document.getElementById('inputValor').value);
+        if(isNaN(valor) || valor <= 0) { alert('Digite um valor válido'); return; }
         
-        if(badge) {
-            badge.innerText = nome;
-            badge.classList.remove("d-none");
+        const descricao = document.getElementById('inputDescricao').value;
+        const data = document.getElementById('inputData').value;
+        const pagamento = document.getElementById('selectPagamento').value;
+        
+        const select = document.getElementById('selectCentroCusto');
+        const categoria = select.value;
+        const categoriaNome = select.options[select.selectedIndex].text;
+        
+        // Pega a pessoa certa dependendo da aba ativa
+        let pessoa = tipo === 'entrada' 
+            ? document.getElementById('inputQuemPagou').value 
+            : document.getElementById('inputFornecedor').value;
+
+        const objetoTransacao = {
+            id: this.idEmEdicao || Date.now(), 
+            tipo, valor, descricao, data, pagamento, pessoa, categoria, categoriaNome,
+            usuario: 'Admin'
+        };
+
+        Repository.salvarTransacao(objetoTransacao);
+
+        bootstrap.Modal.getInstance(document.getElementById('modalNovaMovimentacao')).hide();
+        UI.atualizarTela();
+    },
+
+    excluirTransacao: function() {
+        if(confirm('Deseja excluir esta movimentação?')) {
+            Repository.removerTransacao(this.idEmEdicao);
+            bootstrap.Modal.getInstance(document.getElementById('modalDetalhes')).hide();
+            UI.atualizarTela();
         }
-        if(btnLimpar) btnLimpar.classList.remove("d-none");
-
-        UI.atualizarTela();
     },
-
-    limparFiltroCategoria: function() {
-        UI.estado.filtroCategoria = 'todos';
-        document.getElementById("badgeFiltroAtual").classList.add("d-none");
-        document.getElementById("btnLimparFiltro").classList.add("d-none");
-        UI.atualizarTela();
-    },
-
-    prepararNova: function() {
-        this.idEmEdicao = null;
-        document.getElementById('formMovimentacao').reset();
-        UI.toggleTipoModal('entrada');
-    },
-
+    
     prepararEdicao: function() {
-        const transacao = MockBackendService.database.find(t => t.id === this.idEmEdicao);
+        // Agora busca do Repository
+        const todas = Repository.getAllTransacoes(); 
+        const transacao = todas.find(t => t.id === this.idEmEdicao);
         if(!transacao) return;
 
-        bootstrap.Modal.getInstance(document.getElementById('modalDetalhes')).hide();
+        // Fecha modal de detalhes e prepara o de edição
+        const modalDetalhes = bootstrap.Modal.getInstance(document.getElementById('modalDetalhes'));
+        if(modalDetalhes) modalDetalhes.hide();
         
         document.getElementById('inputTipoMovimentacao').value = transacao.tipo;
         document.getElementById('inputValor').value = transacao.valor;
         document.getElementById('inputDescricao').value = transacao.descricao;
         document.getElementById('inputData').value = transacao.data;
-        document.getElementById('selectPagamento').value = transacao.pagamento;
+        document.getElementById('selectPagamento').value = transacao.pagamento || 'Dinheiro';
         document.getElementById('selectCentroCusto').value = transacao.categoria;
 
         if (transacao.tipo === 'entrada') {
@@ -393,78 +531,60 @@ const Controlador = {
         new bootstrap.Modal(document.getElementById('modalNovaMovimentacao')).show();
     },
 
-    salvarTransacao: function() {
-        const tipo = document.getElementById('inputTipoMovimentacao').value;
-        const valor = parseFloat(document.getElementById('inputValor').value);
-        const descricao = document.getElementById('inputDescricao').value;
-        const data = document.getElementById('inputData').value;
-        const pagamento = document.getElementById('selectPagamento').value;
+    prepararNova: function() {
+        this.idEmEdicao = null;
+        document.getElementById('formMovimentacao').reset();
         
-        const select = document.getElementById('selectCentroCusto');
-        const categoria = select.value;
-        const categoriaNome = select.options[select.selectedIndex].text;
+        // Define data de hoje como padrão
+        document.getElementById('inputData').valueAsDate = new Date();
         
-        let pessoa = "";
+        UI.toggleTipoModal('entrada');
+    },
+
+    filtrarPorCategoria: function(slug, nome) {
+        UI.estado.filtroCategoria = slug;
         
-        if (tipo === 'entrada') {
-            pessoa = document.getElementById('inputQuemPagou').value;
-        } else {
-            pessoa = document.getElementById('inputFornecedor').value;
+        const badge = document.getElementById("badgeFiltroAtual");
+        if(badge) {
+            badge.innerText = nome;
+            badge.classList.remove("d-none");
+            document.getElementById("btnLimparFiltro").classList.remove("d-none");
         }
-
-        const objetoTransacao = {
-            id: this.idEmEdicao || null, 
-            tipo, valor, descricao, data, pagamento, pessoa, categoria, categoriaNome,
-            usuario: 'Admin'
-        };
-
-        if (this.idEmEdicao) {
-            MockBackendService.atualizarTransacao(objetoTransacao);
-        } else {
-            MockBackendService.adicionarTransacao(objetoTransacao);
-        }
-
-        bootstrap.Modal.getInstance(document.getElementById('modalNovaMovimentacao')).hide();
+        UI.atualizarTela();
+    },
+    
+    limparFiltroCategoria: function() {
+        UI.estado.filtroCategoria = 'todos';
+        document.getElementById("badgeFiltroAtual").classList.add("d-none");
+        document.getElementById("btnLimparFiltro").classList.add("d-none");
         UI.atualizarTela();
     },
 
-    //Função chamada pelo form do modal novo centro
     salvarNovoCentro: function() {
         const nome = document.getElementById('inputNomeCentro').value;
-        // Pega qual radio button está marcado
-        const tipo = document.querySelector('input[name="tipoCentro"]:checked').value;
+        const tipoEl = document.querySelector('input[name="tipoCentro"]:checked');
+        const tipo = tipoEl ? tipoEl.value : 'geral';
 
         if(nome) {
-            MockBackendService.adicionarCategoria(nome, tipo);
-            
-            // Fecha o modal
+            const slug = nome.toLowerCase().trim().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+            Repository.adicionarCategoria({ slug, nome, tipo });
             bootstrap.Modal.getInstance(document.getElementById('modalNovoCentro')).hide();
-            
-            // Reseta o form para a proxima vez
             document.getElementById('formNovoCentro').reset();
-            
-            //Vai aparecer o card novo e atualizar o select
             UI.atualizarTela();
         }
     },
-
-    excluirTransacao: function() {
-        if(confirm('Deseja excluir esta movimentação?')) {
-            MockBackendService.removerTransacao(this.idEmEdicao);
-            bootstrap.Modal.getInstance(document.getElementById('modalDetalhes')).hide();
-            UI.atualizarTela();
-        }
-    },
-
+    
     abrirDetalhes: function(id) {
         this.idEmEdicao = id;
-        const t = MockBackendService.database.find(item => item.id === id);
-        
+        const t = Repository.getAllTransacoes().find(item => item.id === id);
+        if(!t) return;
+
+        // Preenche Modal Detalhes
         document.getElementById('detalheDescricao').innerText = t.descricao;
         document.getElementById('detalheData').innerText = t.data.split('-').reverse().join('/');
-        document.getElementById('detalhePagamento').innerText = t.pagamento;
+        document.getElementById('detalhePagamento').innerText = t.pagamento || '-';
         document.getElementById('detalheCategoria').innerText = t.categoriaNome;
-        document.getElementById('detalhePessoa').innerText = t.pessoa;
+        document.getElementById('detalhePessoa').innerText = t.pessoa || '-';
 
         const elValor = document.getElementById('detalheValor');
         const elBadge = document.getElementById('detalheTipoBadge');
@@ -494,6 +614,7 @@ const Controlador = {
     }
 };
 
+// Inicialização
 document.addEventListener('DOMContentLoaded', () => {
-    UI.inicializar();
+    Controlador.init();
 });

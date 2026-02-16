@@ -23,47 +23,86 @@
   </head>
 
   <body>
-    <div class="bg-white border-bottom pt-4 pb-3 sticky-top">
+    <div class="bg-white border-bottom pt-3 pb-3 sticky-top">
       <div class="container">
         <div class="d-flex justify-content-between align-items-center">
-          <div class="dropdown">
-            <div
-              class="d-flex flex-column cursor-pointer"
-              data-bs-toggle="dropdown"
+          <div class="d-flex flex-column justify-content-center">
+            <span
+              class="text-muted"
+              style="font-size: 12px; margin-bottom: -4px"
+              >Olá,</span
             >
-              <span
-                class="text-muted"
-                style="font-size: 13px; margin-bottom: -3px"
-                >Olá,</span
-              >
-              <h5 class="fw-bold text-dark m-0 d-flex align-items-center gap-1">
-                Administrador
-              </h5>
-            </div>
-            <ul class="dropdown-menu shadow-sm border-0">
-              <li><a class="dropdown-item" href="#">Meu Perfil</a></li>
-              <li>
-                <a class="dropdown-item text-danger" href="#">Sair</a>
-              </li>
-            </ul>
+            <h6 class="fw-bold text-dark m-0">Administrador</h6>
           </div>
 
-          <div class="d-flex align-items-center gap-2">
+          <div class="dropdown">
             <div
-              class="rounded-circle d-flex align-items-center justify-content-center"
-              style="
-                width: 40px;
-                height: 40px;
-                background-color: #d1e7dd;
-                color: #0f5132;
-              "
+              class="d-flex align-items-center gap-2 cursor-pointer"
+              id="userDropdown"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
             >
-              <i class="fa-regular fa-user fs-5"></i>
+              <div
+                class="rounded-circle d-flex align-items-center justify-content-center border border-success border-opacity-25"
+                style="
+                  width: 42px;
+                  height: 42px;
+                  background-color: #d1e7dd;
+                  color: #0f5132;
+                "
+              >
+                <i class="fa-regular fa-user fs-5"></i>
+              </div>
+
+              <i
+                class="fa-solid fa-chevron-down text-muted"
+                style="font-size: 12px"
+              ></i>
             </div>
-            <i
-              class="fa-solid fa-chevron-down text-muted"
-              style="font-size: 10px"
-            ></i>
+
+            <ul
+              class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 p-2 mt-2"
+              aria-labelledby="userDropdown"
+              style="min-width: 260px"
+            >
+              <li class="px-3 py-3">
+                <h6 class="fw-bold m-0 text-dark">Administrador</h6>
+                <div class="text-muted small">admin@cultiva.com</div>
+              </li>
+
+              <li><hr class="dropdown-divider my-1" /></li>
+
+              <li>
+                <a
+                  class="dropdown-item py-2 d-flex align-items-center gap-3 text-secondary"
+                  href="#"
+                >
+                  <i class="fa-regular fa-circle-user fs-6"></i>
+                  <span>Meu Perfil</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item py-2 d-flex align-items-center gap-3 text-secondary"
+                  href="#"
+                >
+                  <i class="fa-solid fa-users fs-6"></i>
+                  <span>Gerenciar Equipe</span>
+                </a>
+              </li>
+
+              <li><hr class="dropdown-divider my-1" /></li>
+
+              <li>
+                <a
+                  class="dropdown-item py-2 d-flex align-items-center gap-3 text-danger fw-semibold"
+                  href="#"
+                >
+                  <i class="fa-solid fa-arrow-right-from-bracket fs-6"></i>
+                  <span>Sair do Sistema</span>
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
