@@ -1,0 +1,133 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: #1a2b40;
+}
+
+.color-green {
+  color: green;
+}
+
+body {
+  background-color: #f8f9fa;
+  color: #334155;
+}
+.invoice-card {
+  background: white;
+  border-bottom: 1px solid #f1f5f9;
+  padding: 1rem;
+}
+.icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Botões de Tipo de Nota */
+.type-selector .btn-check:checked + .btn-outline-success {
+  background-color: #e8faf0;
+  border-color: #82d6a6;
+  color: #065f46;
+}
+.type-selector .btn {
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+/* Área de Upload */
+.upload-area {
+  border: 2px solid #d1d5db;
+  border-radius: 16px;
+  padding: 30px;
+  text-align: center;
+  color: #6b7280;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.upload-area:hover {
+  border-color: #82d6a6;
+  background-color: #f9fafb;
+}
+
+.btn-register {
+  background-color: #82d6a6;
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  font-weight: 600;
+  color: white;
+  width: 100%;
+}
+.btn-register:hover {
+  background-color: #6bc492;
+  color: white;
+}
+
+.form-label {
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: #374151;
+}
+
+.form-control {
+  border-radius: 12px;
+  padding: 10px 15px;
+  border: 1px solid #d1d5db;
+  color: #6b7280;
+}
+.form-control:focus {
+  box-shadow: none;
+  border-color: #82d6a6;
+}
+
+/* Ajustes para telas até 490px */
+@media (max-width: 490px) {
+  .invoice-number {
+    font-size: 0.9rem;
+  }
+  .invoice-value {
+    font-size: 1rem !important;
+  }
+  .badge-custom {
+    font-size: 0.65rem !important;
+  }
+  .text-muted-custom {
+    font-size: 0.75rem;
+  }
+}
+
+.badge-admin {
+  background-color: #f5f3ff;
+  color: #7c3aed;
+  font-size: 0.7rem;
+  border: 1px solid #ddd6fe;
+}
+.badge-pending {
+  background-color: #fef9c3;
+  color: #854d0e;
+  font-size: 0.7rem;
+}
+.badge-user {
+  background-color: #eff6ff;
+  color: #2563eb;
+  font-size: 0.7rem;
+  border: 1px solid #dbeafe;
+}

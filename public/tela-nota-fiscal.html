@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    />
+    <link rel="stylesheet" href="../css/style.css" />
+    <title>Tela de notas fiscais</title>
+  </head>
+  <body>
+    <header>
+      <div class="container-fluid">
+        <nav class="navbar navbar-expand-sm">
+          <div>
+            <p>
+              Olá,<br /><span class="fw-bold" style="color: #1a2b40"
+                >Administrador</span
+              >
+            </p>
+          </div>
+          <div class="p-2 d-flex align-items-center">
+            <i
+              class="d-flex align-items-center justify-content-center rounded-circle bi bi-person-circle p-1 m-1 fs-4 text-success"
+              style="
+                border: 1px solid none;
+                background-color: lightgreen;
+                width: 40px;
+                height: 40px;
+              "
+            >
+            </i>
+            <i class="bi bi-chevron-down m-1 fs-6"></i>
+          </div>
+        </nav>
+        <hr />
+      </div>
+    </header>
+    <main>
+      <section id="notas-fiscais">
+        <div class="container-fluid">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold m-0 header-title" style="letter-spacing: -0.5px">
+              Notas Fiscais
+            </h2>
+
+            <div class="d-flex gap-2">
+              <button
+                class="btn btn-white border shadow-sm rounded-circle d-flex align-items-center justify-content-center"
+                style="width: 40px; height: 40px"
+              >
+                <i class="bi bi-file-earmark-bar-graph text-secondary"></i>
+              </button>
+              <button
+                id="button-lancamento-nota"
+                type="button"
+                class="btn btn-success shadow-sm rounded-circle d-flex align-items-center justify-content-center"
+                style="
+                  width: 40px;
+                  height: 40px;
+                  background-color: #00a859;
+                  border: none;
+                "
+                data-bs-toggle="modal"
+                data-bs-target="#invoice-modal"
+              >
+                <i class="bi bi-plus-lg fs-5"></i>
+              </button>
+            </div>
+            <div class="modal" tabindex="-1" id="invoice-modal">
+              <div class="modal-dialog modal-fullscreen-sm-down">
+                <div class="modal-content">
+                  <div
+                    class="modal-header d-flex flex-column justify-content-start"
+                  >
+                    <button
+                      type="button"
+                      class="btn-close"
+                      data-bs-dismiss="modal"
+                      aria-label="Close"
+                    ></button>
+                    <div>
+                      <h5 class="modal-title">Nova Nota Fiscal</h5>
+                      <p style="font-size: 14px; letter-spacing: 0.5px">
+                        Registre uma nova nota fiscal de entrada ou saída
+                      </p>
+                    </div>
+                  </div>
+                  <div class="modal-body">
+                    <form id="register-form">
+                      <label class="form-label">Tipo de Nota</label>
+                      <div class="row g-2 type-selector mb-3">
+                        <div class="col-6">
+                          <input
+                            type="radio"
+                            class="btn-check"
+                            name="invoiceTypeOut"
+                            id="invoiceTypeOut"
+                            checked
+                          />
+                          <label
+                            for="invoiceTypeOut"
+                            class="btn btn-outline-success d-flex flex-column"
+                          >
+                            <span
+                              class="d-flex align-items-center gap-2 fw-bold"
+                            >
+                              <i class="bi bi-arrow-up-right text-success"></i>
+                              Saída (Venda)
+                            </span>
+                          </label>
+                        </div>
+                        <div class="col-6">
+                          <input
+                            type="radio"
+                            class="btn-check"
+                            name="invoiceTypeIn"
+                            id="invoiceTypeIn"
+                          />
+                          <label
+                            for="invoiceTypeIn"
+                            class="btn btn-outline-secondary d-flex flex-column"
+                          >
+                            <span
+                              class="d-flex align-items-center gap-2 text-secondary"
+                            >
+                              <i class="bi bi-arrow-down-left"></i>
+                              Entrada<br />(Despesa)
+                            </span>
+                          </label>
+                        </div>
+                      </div>
+
+                      <div class="row g-2 mb-3">
+                        <div class="col-6">
+                          <label for="invoiceNumber" class="form-label"
+                            >Número da Nota</label
+                          >
+                          <input
+                            type="text"
+                            class="form-control"
+                            placeholder="Ex: 12345"
+                            name="invoiceNumber"
+                            id="invoiceNumber"
+                          />
+                        </div>
+                        <div class="col-6">
+                          <label for="invoiceIssueDate" class="form-label"
+                            >Data de Emissão</label
+                          >
+                          <div class="position-relative">
+                            <input
+                              id="invoiceIssueDate"
+                              name="invoiceIssueDate"
+                              type="date"
+                              class="form-control"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="invoiceValue" class="form-label"
+                          >Valor (R$)</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          placeholder="0,00"
+                          id="invoiceValue"
+                          name="invoiceValue"
+                        />
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="description" class="form-label"
+                          >Descrição</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          placeholder="Ex: Venda de Soja"
+                          id="description"
+                          name="description"
+                        />
+                      </div>
+
+                      <!--Verificar se é possível colocar esse centro de custo como um select-->
+                      <div class="mb-3">
+                        <label for="costCenter" class="form-label"
+                          >Centro de Custo</label
+                        >
+                        <select
+                          class="form-select"
+                          name="costCenter"
+                          id="costCenter"
+                        >
+                          <option value="Agricultura">Agricultura</option>
+                          <option value="Agropecuária">Agropecuária</option>
+                          <option value="Pecuária">Pecuária</option>
+                          <option value="Agroindústria">Agroindústria</option>
+                        </select>
+                      </div>
+
+                      <div class="mb-4">
+                        <label for="fileUpload" class="form-label text-muted"
+                          >Arquivo da Nota
+                          <span class="fw-normal">(Opcional)</span></label
+                        >
+                        <div class="upload-area">
+                          <i class="bi bi-upload fs-2 d-block mb-2"></i>
+                          <span class="d-block fw-medium"
+                            >Envio de fotos ou PDF</span
+                          >
+                          <small class="text-muted" style="font-size: 11px"
+                            >Máx. 5MB</small
+                          >
+                        </div>
+                        <input
+                          type="file"
+                          id="fileUpload"
+                          class="mt-3 text-center form-control"
+                        />
+                      </div>
+
+                      <button
+                        id="registerInvoice"
+                        type="submit"
+                        class="btn btn-register"
+                      >
+                        Registrar Nota
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row g-3">
+            <div class="col-12">
+              <div
+                class="card border-2 rounded-4 bg-warning-subtle"
+                style="border-color: #fce7a2 !important"
+              >
+                <div class="card-body p-4">
+                  <div class="d-flex align-items-center mb-1">
+                    <i
+                      class="bi bi-exclamation-circle text-warning me-2 fs-6"
+                    ></i>
+                    <small
+                      class="fw-bold text-warning-emphasis"
+                      style="letter-spacing: 0.5px"
+                      >PENDENTES</small
+                    >
+                  </div>
+                  <div
+                    class="display-number fw-bold mb-0"
+                    style="color: #856404; font-size: 3.5rem; line-height: 1.1"
+                  >
+                    1
+                  </div>
+                  <p class="text-warning-emphasis mb-0 opacity-75">
+                    Aguardando Contra Nota
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div
+                class="card border-2 rounded-4 bg-success-subtle"
+                style="border-color: #d1e7dd !important"
+              >
+                <div class="card-body p-4">
+                  <div class="d-flex align-items-center mb-1">
+                    <i class="bi bi-check-circle text-success me-2 fs-6"></i>
+                    <small
+                      class="fw-bold text-success-emphasis"
+                      style="letter-spacing: 0.5px"
+                      >REGULARIZADAS</small
+                    >
+                  </div>
+                  <div
+                    class="display-number fw-bold mb-0"
+                    style="color: #0f5132; font-size: 3.5rem; line-height: 1.1"
+                  >
+                    2
+                  </div>
+                  <p class="text-success-emphasis mb-0 opacity-75">
+                    Processo concluído
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="todas-as-notas">
+        <div
+          style="
+            max-width: 500px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+          "
+          class="container-fluid"
+        >
+          <div class="d-flex align-items-center gap-2 mt-3">
+            <i class="bi bi-file-earmark-text fs-4 text-secondary"></i>
+            <h4 class="fw-bold m-0 header-title">Todas as notas</h4>
+          </div>
+          <div class="d-flex gap-2 mb-4">
+            <div class="input-group input-group-sm border rounded-pill px-2">
+              <span class="input-group-text bg-transparent border-0"
+                ><i class="bi bi-people text-muted"></i
+              ></span>
+              <input
+                type="text"
+                class="form-control border-0 shadow-none"
+                placeholder=""
+              />
+            </div>
+            <button class="btn btn-sm text-secondary border-0">
+              <i class="bi bi-funnel fs-4"></i>
+            </button>
+          </div>
+          <div class="invoice-list">
+            <div class="invoice-card mx-n3">
+              <div
+                class="d-flex justify-content-between align-items-start mb-2"
+              >
+                <div class="d-flex gap-3">
+                  <div class="icon-box bg-success-subtle text-success">
+                    <i class="bi bi-arrow-up-right"></i>
+                  </div>
+                  <div>
+                    <div class="d-flex align-items-center gap-1 flex-wrap">
+                      <span class="fw-bold invoice-number">NF-1023</span>
+                      <span class="badge badge-admin rounded-pill">Admin</span>
+                      <span class="badge badge-pending rounded-pill"
+                        >PENDENTE</span
+                      >
+                    </div>
+                    <div class="fw-medium mt-1" style="font-size: 0.95rem">
+                      Venda de Soja - Coop
+                    </div>
+                    <small class="text-muted d-block">Vendas & Comercial</small>
+                  </div>
+                </div>
+                <div class="text-end">
+                  <div
+                    class="fw-bold text-success invoice-value"
+                    style="font-size: 1.1rem"
+                  >
+                    R$ 15.000,00
+                  </div>
+                  <small class="text-muted" style="font-size: 0.75rem"
+                    >24/10/2023</small
+                  >
+                </div>
+              </div>
+              <div
+                class="d-flex justify-content-between align-items-center mt-3"
+              >
+                <div
+                  class="d-flex align-items-center gap-2 text-muted-custom"
+                  style="font-size: 0.85rem"
+                >
+                  <input type="checkbox" class="form-check-input m-0" />
+                  <span>Marcar recebimento</span>
+                </div>
+                <i
+                  class="bi bi-trash3 text-light-emphasis"
+                  style="cursor: pointer"
+                ></i>
+              </div>
+            </div>
+
+            <div class="invoice-card mx-n3">
+              <div
+                class="d-flex justify-content-between align-items-start mb-2"
+              >
+                <div class="d-flex gap-3">
+                  <div class="icon-box bg-danger-subtle text-danger">
+                    <i class="bi bi-arrow-down-left"></i>
+                  </div>
+                  <div>
+                    <div class="d-flex align-items-center gap-1 flex-wrap">
+                      <span class="fw-bold invoice-number">NF-5501</span>
+                      <span class="badge badge-admin rounded-pill">Admin</span>
+                    </div>
+                    <div class="fw-medium mt-1" style="font-size: 0.95rem">
+                      Compra de Defensivos
+                    </div>
+                    <small class="text-muted d-block">Insumos Agrícolas</small>
+                  </div>
+                </div>
+                <div class="text-end">
+                  <div
+                    class="fw-bold text-danger invoice-value"
+                    style="font-size: 1.1rem"
+                  >
+                    R$ 2.300,50
+                  </div>
+                  <small class="text-muted" style="font-size: 0.75rem"
+                    >19/10/2023</small
+                  >
+                </div>
+              </div>
+              <div
+                class="d-flex justify-content-between align-items-center mt-3"
+              >
+                <div
+                  class="d-flex align-items-center gap-2 text-success"
+                  style="font-size: 0.85rem"
+                >
+                  <i class="bi bi-check-circle-fill"></i>
+                  <span class="fw-medium">Contra Nota Recebida</span>
+                </div>
+                <i
+                  class="bi bi-trash3 text-light-emphasis"
+                  style="cursor: pointer"
+                ></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <div
+        class="container-fluid mt-3 p-3 d-flex justify-content-evenly border"
+      >
+        <div class="d-flex flex-column align-items-center">
+          <i class="bi bi-house-fill"></i>
+          <p style="font-size: 14px; letter-spacing: 1px">Inicio</p>
+        </div>
+        <div class="d-flex flex-column align-items-center">
+          <i class="bi bi-wallet"></i>
+          <p style="font-size: 14px; letter-spacing: 1px">Custos</p>
+        </div>
+        <div class="d-flex flex-column align-items-center">
+          <i class="bi bi-file-earmark"></i>
+          <p style="font-size: 14px; letter-spacing: 1px">Notas</p>
+        </div>
+        <div class="d-flex flex-column align-items-center">
+          <i class="bi bi-calendar"></i>
+          <p style="font-size: 14px; letter-spacing: 1px">Calendario</p>
+        </div>
+      </div>
+    </footer>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous"
+    ></script>
+    <script src="../js/tela-nota-fiscal.js"></script>
+  </body>
+</html>
