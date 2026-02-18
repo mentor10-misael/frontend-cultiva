@@ -647,90 +647,108 @@
           </div>
 
           <div class="modal-body px-4 pb-4 pt-2">
-            <h5 class="fw-bold mb-2">Novo Centro de Custo</h5>
-            <p class="text-muted fs-xs mb-4">
-              Crie uma nova categoria para organizar suas finanças.
-            </p>
+  <h5 class="fw-bold mb-2">Novo Centro de Custo</h5>
+  <p class="text-muted fs-xs mb-4">
+    Crie uma nova categoria para organizar suas finanças.
+  </p>
 
-            <form id="formNovoCentro">
-              <label class="form-label fw-bold fs-xs text-dark"
-                >Tipo de Centro</label
-              >
-              <div class="row g-2 mb-4">
-                <div class="col-4">
-                  <input
-                    type="radio"
-                    class="btn-check"
-                    name="tipoCentro"
-                    id="tipoLavoura"
-                    value="lavoura"
-                    checked
-                  />
-                  <label
-                    class="card card-select h-100 d-flex flex-column align-items-center justify-content-center p-2 cursor-pointer"
-                    for="tipoLavoura"
-                  >
-                    <i class="fa-solid fa-seedling fs-4 mb-2"></i>
-                    <span class="fs-xxs fw-bold text-center">Lavoura</span>
-                  </label>
-                </div>
+  <form id="formNovoCentro">
+    <label class="form-label fw-bold fs-xs text-dark">Tipo de Centro</label>
+    
+    <div class="row g-2 mb-3">
+      <div class="col-4">
+        <input type="radio" class="btn-check" name="tipoCentro" id="tipoLavoura" value="lavoura" checked onchange="UI.mudarTipoCentro('lavoura')"/>
+        <label class="card card-select h-100 d-flex flex-column align-items-center justify-content-center p-2 cursor-pointer" for="tipoLavoura">
+          <i class="fa-solid fa-seedling fs-4 mb-2"></i>
+          <span class="fs-xxs fw-bold text-center">Lavoura</span>
+        </label>
+      </div>
 
-                <div class="col-4">
-                  <input
-                    type="radio"
-                    class="btn-check"
-                    name="tipoCentro"
-                    id="tipoMaquinas"
-                    value="maquinas"
-                  />
-                  <label
-                    class="card card-select h-100 d-flex flex-column align-items-center justify-content-center p-2 cursor-pointer"
-                    for="tipoMaquinas"
-                  >
-                    <i class="fa-solid fa-tractor fs-4 mb-2"></i>
-                    <span class="fs-xxs fw-bold text-center">Máquinas</span>
-                  </label>
-                </div>
+      <div class="col-4">
+        <input type="radio" class="btn-check" name="tipoCentro" id="tipoMaquinas" value="maquinas" onchange="UI.mudarTipoCentro('maquinas')"/>
+        <label class="card card-select h-100 d-flex flex-column align-items-center justify-content-center p-2 cursor-pointer" for="tipoMaquinas">
+          <i class="fa-solid fa-tractor fs-4 mb-2"></i>
+          <span class="fs-xxs fw-bold text-center">Máquinas</span>
+        </label>
+      </div>
 
-                <div class="col-4">
-                  <input
-                    type="radio"
-                    class="btn-check"
-                    name="tipoCentro"
-                    id="tipoGeral"
-                    value="geral"
-                  />
-                  <label
-                    class="card card-select h-100 d-flex flex-column align-items-center justify-content-center p-2 cursor-pointer"
-                    for="tipoGeral"
-                  >
-                    <i class="fa-solid fa-building fs-4 mb-2"></i>
-                    <span class="fs-xxs fw-bold text-center">Geral</span>
-                  </label>
-                </div>
-              </div>
+      <div class="col-4">
+        <input type="radio" class="btn-check" name="tipoCentro" id="tipoGeral" value="geral" onchange="UI.mudarTipoCentro('geral')"/>
+        <label class="card card-select h-100 d-flex flex-column align-items-center justify-content-center p-2 cursor-pointer" for="tipoGeral">
+          <i class="fa-solid fa-building fs-4 mb-2"></i>
+          <span class="fs-xxs fw-bold text-center">Geral</span>
+        </label>
+      </div>
+    </div>
 
-              <div class="mb-3">
-                <label class="form-label fw-bold fs-xs text-dark"
-                  >Nome do Centro</label
-                >
-                <input
-                  type="text"
-                  class="form-control fs-sm"
-                  id="inputNomeCentro"
-                  placeholder="Ex: Soja 2026, Trator Azul..."
-                  required
-                />
-              </div>
+    <div class="mb-3">
+      <label class="form-label fw-bold fs-xs text-dark">Nome / Apelido</label>
+      <input type="text" class="form-control fs-sm" id="inputNomeCentro" placeholder="Ex: Talhão do Rio" required />
+    </div>
 
-              <button
-                type="submit"
-                class="btn btn-success w-100 py-2 rounded-3 fw-bold"
-              >
-                <i class="fa-solid fa-check me-2"></i> Criar Centro de Custo
-              </button>
-            </form>
-          </div>
+    <div class="mb-3">
+      <label class="form-label fw-bold fs-xs text-dark">Descrição</label>
+      <textarea class="form-control fs-sm" id="inputDescricaoCentro" rows="2" placeholder="Breve descrição para identificação..."></textarea>
+    </div>
+
+    <div id="camposLavoura">
+      <div class="row g-2 mb-3">
+        <div class="col-8">
+          <label class="form-label fw-bold fs-xs text-dark">Tamanho da Área</label>
+          <input type="number" class="form-control fs-sm" id="inputArea" placeholder="0.00" step="0.01">
+        </div>
+        <div class="col-4">
+          <label class="form-label fw-bold fs-xs text-dark">Unidade</label>
+          <select class="form-select fs-sm" id="inputUnidade">
+            <option value="ha">hectare</option>
+            <option value="alq">alqueire</option>
+          </select>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-bold fs-xs text-dark">Cultura Atual <span class="text-muted fw-normal">(Opcional)</span></label>
+        <input type="text" class="form-control fs-sm" id="inputCultura" placeholder="Ex: Soja">
+      </div>
+    </div>
+
+    <div id="camposMaquinas" class="d-none">
+      <div class="mb-3">
+        <label class="form-label fw-bold fs-xs text-dark">Modelo / Marca</label>
+        <input type="text" class="form-control fs-sm" id="inputModelo" placeholder="Ex: John Deere 5078E">
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-bold fs-xs text-dark">Ano de Aquisição</label>
+        <input type="number" class="form-control fs-sm" id="inputAno" placeholder="Ex: 2021">
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-bold fs-xs text-dark">Identificação <span class="text-muted fw-normal">(Opcional)</span></label>
+        <input type="text" class="form-control fs-sm" id="inputSerial" placeholder="Placa ou Nº de Série">
+      </div>
+    </div>
+
+    <div id="infoGeral" class="d-none mb-4">
+      <div class="alert alert-purple d-flex gap-3 p-3 rounded-3">
+        <i class="fa-solid fa-building text-purple fs-5 mt-1"></i>
+        <div>
+          <h6 class="fw-bold text-purple mb-1 fs-sm">Centro de Custo Geral</h6>
+          <p class="mb-0 fs-xs text-muted" style="line-height: 1.4;">
+            Utilize esta categoria para agrupar despesas que não estão diretamente ligadas a uma área produtiva ou veículo específico (ex: Contabilidade, Energia, Escritório).
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2">
+  <button type="button" class="btn btn-light w-50 py-2 rounded-3 fw-bold text-secondary border" data-bs-dismiss="modal">
+    Cancelar
+  </button>
+  
+  <button type="submit" id="btnCriarCentro" class="btn btn-success w-50 py-2 rounded-3 fw-bold transition-all">
+    <i class="fa-solid fa-check me-2"></i> Criar Centro de Custo
+  </button>
+</div>
+  </form>
+</div>
         </div>
       </div>
     </div>

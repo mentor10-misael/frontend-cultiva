@@ -306,3 +306,38 @@ body {
 .w-45 {
     width: 48%;
 }
+
+.transition-all {
+  transition: all 0.3s ease;
+}
+
+/* Cores específicas para os botões */
+.btn-lavoura {
+  background-color: #198754; /* Verde */
+  border-color: #198754;
+  color: white;
+}
+.btn-lavoura:hover { background-color: #157347; color: white; }
+
+.btn-maquinas {
+  background-color: #0d6efd; /* Azul */
+  border-color: #0d6efd;
+  color: white;
+}
+.btn-maquinas:hover { background-color: #0b5ed7; color: white; }
+
+.btn-geral {
+  background-color: #a855f7; /* Roxo */
+  border-color: #a855f7;
+  color: white;
+}
+.btn-geral:hover { background-color: #9333ea; color: white; }
+
+/* Estilização do Alerta Roxo (Geral) */
+.alert-purple {
+  background-color: #faf5ff;
+  border: 1px solid #e9d5ff;
+}
+.text-purple {
+  color: #a855f7;
+}

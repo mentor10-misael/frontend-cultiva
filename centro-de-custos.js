@@ -399,7 +399,41 @@ const UI = {
             const original = btn.getAttribute('data-orig');
             if(original) btn.innerHTML = original;
         }
+    },
+
+mudarTipoCentro: function(tipo) {
+    // 1. Esconder todos os grupos específicos
+    document.getElementById('camposLavoura').classList.add('d-none');
+    document.getElementById('camposMaquinas').classList.add('d-none');
+    document.getElementById('infoGeral').classList.add('d-none');
+    
+    // 2. Elementos de UI para alterar
+    const btn = document.getElementById('btnCriarCentro');
+    const inputNome = document.getElementById('inputNomeCentro');
+
+    // 3. Lógica por tipo
+    if (tipo === 'lavoura') {
+        document.getElementById('camposLavoura').classList.remove('d-none');
+        inputNome.placeholder = "Ex: Terreno do Rio";
+        
+        // Muda cor do botão para VERDE
+        btn.className = 'btn btn-lavoura w-100 py-2 rounded-3 fw-bold transition-all';
+    } 
+    else if (tipo === 'maquinas') {
+        document.getElementById('camposMaquinas').classList.remove('d-none');
+        inputNome.placeholder = "Ex: Trator Principal";
+        
+        // Muda cor do botão para AZUL
+        btn.className = 'btn btn-maquinas w-100 py-2 rounded-3 fw-bold transition-all';
+    } 
+    else if (tipo === 'geral') {
+        document.getElementById('infoGeral').classList.remove('d-none');
+        inputNome.placeholder = "Ex: Escritório Sede";
+        
+        // Muda cor do botão para ROXO
+        btn.className = 'btn btn-geral w-100 py-2 rounded-3 fw-bold transition-all';
     }
+},
 };
 
 // ==========================================
@@ -561,18 +595,47 @@ const Controlador = {
     },
 
     salvarNovoCentro: function() {
-        const nome = document.getElementById('inputNomeCentro').value;
-        const tipoEl = document.querySelector('input[name="tipoCentro"]:checked');
-        const tipo = tipoEl ? tipoEl.value : 'geral';
+    // Dados Comuns
+    const nome = document.getElementById('inputNomeCentro').value;
+    const descricao = document.getElementById('inputDescricaoCentro').value;
+    const tipoEl = document.querySelector('input[name="tipoCentro"]:checked');
+    const tipo = tipoEl ? tipoEl.value : 'geral';
 
-        if(nome) {
-            const slug = nome.toLowerCase().trim().replace(/ /g, '-').replace(/[^\w-]+/g, '');
-            Repository.adicionarCategoria({ slug, nome, tipo });
-            bootstrap.Modal.getInstance(document.getElementById('modalNovoCentro')).hide();
-            document.getElementById('formNovoCentro').reset();
-            UI.atualizarTela();
-        }
-    },
+    if (!nome) return;
+
+    // Objeto base
+    let novoCentro = {
+        id: Date.now(), // ID único temporário
+        slug: nome.toLowerCase().trim().replace(/ /g, '-').replace(/[^\w-]+/g, ''),
+        nome,
+        descricao,
+        tipo,
+        saldo: 0
+    };
+
+    // Pega dados específicos baseado no tipo
+    if (tipo === 'lavoura') {
+        novoCentro.area = document.getElementById('inputArea').value;
+        novoCentro.unidade = document.getElementById('inputUnidade').value;
+        novoCentro.cultura = document.getElementById('inputCultura').value;
+    } else if (tipo === 'maquinas') {
+        novoCentro.modelo = document.getElementById('inputModelo').value;
+        novoCentro.ano = document.getElementById('inputAno').value;
+        novoCentro.serial = document.getElementById('inputSerial').value;
+    }
+
+    // Salva no Repository
+    Repository.adicionarCategoria(novoCentro);
+
+    // Fecha modal e limpa
+    bootstrap.Modal.getInstance(document.getElementById('modalNovoCentro')).hide();
+    document.getElementById('formNovoCentro').reset();
+    
+    // Reseta visual para o padrão (Lavoura)
+    UI.mudarTipoCentro('lavoura'); 
+    
+    UI.atualizarTela();
+},
     
     abrirDetalhes: function(id) {
         this.idEmEdicao = id;
