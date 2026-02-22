@@ -25,7 +25,7 @@
   <body>
     <header>
       <div class="container-fluid">
-        <nav class="navbar navbar-expand-sm">
+        <nav class="navbar navbar-expand-sm d-flex justify-content-between">
           <div>
             <p>
               Olá,<br /><span class="fw-bold" style="color: #1a2b40"
@@ -44,7 +44,15 @@
               "
             >
             </i>
-            <i class="bi bi-chevron-down m-1 fs-6"></i>
+            <i
+              class="bi bi-chevron-down m-1 fs-6 dropdown-toggle"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            ></i>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Sair</a></li>
+              <li><a class="dropdown-item" href="#">Mudar de usuário</a></li>
+            </ul>
           </div>
         </nav>
         <hr />
@@ -60,13 +68,19 @@
 
             <div class="d-flex gap-2">
               <button
+                id="button-reports"
                 class="btn btn-white border shadow-sm rounded-circle d-flex align-items-center justify-content-center"
-                style="width: 40px; height: 40px"
+                style="
+                  width: 40px;
+                  height: 40px;
+                  background-color: #fff;
+                  border: none;
+                "
               >
                 <i class="bi bi-file-earmark-bar-graph text-secondary"></i>
               </button>
               <button
-                id="button-lancamento-nota"
+                id="button-add-invoice"
                 type="button"
                 class="btn btn-success shadow-sm rounded-circle d-flex align-items-center justify-content-center"
                 style="
@@ -81,6 +95,7 @@
                 <i class="bi bi-plus-lg fs-5"></i>
               </button>
             </div>
+            <!--MODAL DO REGISTRO DE NOTAS-->
             <div class="modal" tabindex="-1" id="invoice-modal">
               <div class="modal-dialog modal-fullscreen-sm-down">
                 <div class="modal-content">
@@ -248,6 +263,7 @@
                 </div>
               </div>
             </div>
+            <!--MODAL DO REGISTRO DE NOTAS-->
           </div>
           <div class="row g-3">
             <div class="col-12">
