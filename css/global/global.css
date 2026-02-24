@@ -1,5 +1,7 @@
 body {
-  padding-top: 79px;
+  padding: 0 1rem;
+  padding-top: 103px;
+
   margin: 0;
   color: #101828;
 }
@@ -10,8 +12,14 @@ h3,
 h4,
 h5,
 button,
+ul,
 p {
   margin: 0;
+}
+
+ul {
+  padding: 0px;
+  list-style: none;
 }
 
 button {

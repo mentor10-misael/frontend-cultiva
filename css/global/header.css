@@ -9,7 +9,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem;
-  border: 2px solid #e5e7eb;
+  border-bottom: 2px solid #e5e7eb;
 }
 
 .header-titulo span {
