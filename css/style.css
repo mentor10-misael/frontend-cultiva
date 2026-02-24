@@ -1,4 +1,6 @@
+/* GLOBAL */
 @import "./global/global.css";
+@import "./global/header.css";
 
 /* CALENDARIO */
 @import "./calendario/calendario.css";

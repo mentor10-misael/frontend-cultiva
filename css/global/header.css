@@ -1,0 +1,39 @@
+.header-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border: 2px solid #e5e7eb;
+}
+
+.header-titulo span {
+  font-size: 0.75rem;
+  color: #6a7282;
+}
+
+.header-titulo h2 {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.header-perfil {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.perfil {
+  background: #dcfce7;
+  width: 32px;
+  height: 32px;
+  border: 2px solid #b9f8cf;
+  color: #008236;
+  padding: 0.25rem;
+  border-radius: 50%;
+}
