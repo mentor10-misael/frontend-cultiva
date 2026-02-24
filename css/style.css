@@ -1,3 +1,5 @@
+@import "./global/global.css";
+
 /* CALENDARIO */
 @import "./calendario/calendario.css";
 @import "./calendario/agenda-dia.css";
