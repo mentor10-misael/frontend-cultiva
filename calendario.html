@@ -174,30 +174,26 @@
       </div>
     </section>
     <section>
-      <div class="d-flex gap-3 mb-3">
-        <i class="bi bi-calendar4" style="font-size: 1.5rem;"></i>
+      <div class="tarefas-cabecalho">
+        <img src="./assets/images/icons/calendario.svg" alt="">
         <h2>Agenda do Dia</h2>
       </div>
-      <div class="card border-2 shadow-sm rounded-4">
-        <div class="card-body d-flex justify-content-between align-items-center">
-          <div class="d-flex align-items-center gap-3 p-2">
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="opcao" id="opcao1" style="width: 25px; height: 25px;">
-            </div>
-            <div>
-              <h5 class=" card-title">Aplicar inseticida</h5>
-              <div class="card-text p- d-inline-block" style="background: #EFF6FF; border-radius: 49px; color: #155DFC;">
-                <i class="bi bi-clock "></i>
-                <span>
-                  18:57
-                </span>
-              </div>
+      <div class="container tarefas-container">
+        <label class="tarefas-conteudo">
+          <input type="checkbox" name="tarefas-checar">
+          <div>
+            <h3>Aplicar inseticida</h3>
+            <div class="tarefas-relogio">
+              <img src="./assets/images/icons/relogio.svg" alt="">
+              <span>
+                18:57
+              </span>
             </div>
           </div>
-          <button class="btn ">
-            <i class="bi bi-three-dots-vertical" style="font-size: 2rem;"></i>
-          </button>
-        </div>
+        </label>
+        <button>
+          <img src="./assets/images/icons/opcao.svg" alt="">
+        </button>
       </div>
     </section>
   </main>

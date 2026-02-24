@@ -1,0 +1,57 @@
+.tarefas-cabecalho {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.tarefas-cabecalho h2 {
+  font-size: 1.125rem;
+  font-weight: bold;
+}
+
+.tarefas-container {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tarefas-conteudo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.tarefas-conteudo input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+input[type="checkbox"]:checked + .tarefas-conteudo input {
+  background-color: #198754;
+  border-color: #198754;
+}
+
+.tarefas-conteudo h3 {
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.tarefas-relogio {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: #eff6ff;
+  color: #155dfc;
+  width: 62px;
+  height: 20px;
+  padding: 0.25rem 0.5rem;
+  border-radius: 50px;
+  font-weight: bold;
+}
+
+.tarefas-relogio span {
+  font-size: 0.75rem;
+}

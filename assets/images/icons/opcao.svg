@@ -1,5 +1,1 @@
-<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M11.9998 12.9997C12.552 12.9997 12.9998 12.552 12.9998 11.9997C12.9998 11.4474 12.552 10.9997 11.9998 10.9997C11.4475 10.9997 10.9998 11.4474 10.9998 11.9997C10.9998 12.552 11.4475 12.9997 11.9998 12.9997Z" stroke="#99A1AF" stroke-width="1.99995" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M11.9998 5.99989C12.552 5.99989 12.9998 5.55218 12.9998 4.99989C12.9998 4.44761 12.552 3.99989 11.9998 3.99989C11.4475 3.99989 10.9998 4.44761 10.9998 4.99989C10.9998 5.55218 11.4475 5.99989 11.9998 5.99989Z" stroke="#99A1AF" stroke-width="1.99995" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M11.9998 19.9995C12.552 19.9995 12.9998 19.5518 12.9998 18.9995C12.9998 18.4473 12.552 17.9995 11.9998 17.9995C11.4475 17.9995 10.9998 18.4473 10.9998 18.9995C10.9998 19.5518 11.4475 19.9995 11.9998 19.9995Z" stroke="#99A1AF" stroke-width="1.99995" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"><path stroke="#99A1AF" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2ZM12 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2ZM12 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"/></svg>
