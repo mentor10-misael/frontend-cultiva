@@ -1,8 +1,11 @@
 /* GLOBAL */
-@import "./global/global.css";
-@import "./global/header.css";
-@import "./global/footer.css";
+@import "./layout/global.css";
+@import "./layout/header.css";
+@import "./layout/footer.css";
+
+/* COMPONENTES */
+@import "./components/bottom-sheet.css";
 
 /* CALENDARIO */
-@import "./calendario/calendario.css";
-@import "./calendario/agenda-dia.css";
+@import "./pages/calendario/calendario.css";
+@import "./pages/calendario/agenda-dia.css";

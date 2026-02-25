@@ -1,0 +1,29 @@
+.sheet-fundo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+.sheet-mao {
+  width: 48px;
+  height: 6px;
+  background: #d1d5dc;
+  border-radius: 50px;
+  margin: 0 auto 1.5rem;
+}
+
+.bottom-sheet {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  min-height: 75vh;
+  background-color: #ffffff;
+  z-index: 11;
+  border-radius: 10px 10px 0 0;
+  padding: 1rem;
+}
