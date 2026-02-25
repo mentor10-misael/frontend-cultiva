@@ -19,6 +19,9 @@
       defer
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
     ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    
     <script defer src="centro-de-custos.js"></script>
   </head>
 
@@ -249,74 +252,47 @@
       </div>
     </nav>
 
-    <div
-      class="modal fade"
-      id="modalRelatorio"
-      tabindex="-1"
-      aria-hidden="true"
-    >
+    <div class="modal fade" id="modalRelatorio" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-4 border-0 shadow-lg p-2">
           <div class="modal-header border-bottom-0 pb-0">
-            <h5
-              class="modal-title fw-bold d-flex align-items-center gap-2 fs-6"
-            >
+            <h5 class="modal-title fw-bold d-flex align-items-center gap-2 fs-6">
               <i class="fa-regular fa-file-lines text-success fs-5"></i>
               Relatório de Custos
             </h5>
-            <button
-              type="button"
-              class="btn-close fs-sm"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
+            <button type="button" class="btn-close fs-sm" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
 
           <div class="modal-body">
             <div class="mb-3">
-              <label class="form-label fw-bold fs-xs mb-2 text-dark"
-                >Centros de Custo</label
-              >
-              <div class="d-flex gap-2 overflow-auto pb-2 scroll-hide">
-                <input
-                  type="checkbox"
-                  class="btn-check"
-                  id="tagMilho"
-                  autocomplete="off"
-                  checked
-                />
-                <label
-                  class="btn btn-outline-secondary rounded-pill fs-xs text-nowrap px-3"
-                  for="tagMilho"
-                  >Milho</label
-                >
-                <input
-                  type="checkbox"
-                  class="btn-check"
-                  id="tagMaquinas"
-                  autocomplete="off"
-                />
-                <label
-                  class="btn btn-outline-secondary rounded-pill fs-xs text-nowrap px-3"
-                  for="tagMaquinas"
-                  >Máquinas</label
-                >
-                <input
-                  type="checkbox"
-                  class="btn-check"
-                  id="tagGeral"
-                  autocomplete="off"
-                />
-                <label
-                  class="btn btn-outline-secondary rounded-pill fs-xs text-nowrap px-3"
-                  for="tagGeral"
-                  >Geral</label
-                >
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                  <label class="form-label fw-bold fs-xs text-dark m-0">Centros de Custo</label>
+                  <div class="form-check form-switch fs-xs m-0">
+                      <input class="form-check-input" type="checkbox" id="checkTodosCentros" checked>
+                      <label class="form-check-label text-muted" for="checkTodosCentros">Todos</label>
+                  </div>
+              </div>
+              <div class="d-flex gap-2 overflow-auto pb-2 scroll-hide" id="listaFiltroCentros"></div>
+            </div>
+
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label class="form-label fw-bold fs-xs text-dark mb-1">Data Inicial</label>
+                <input type="date" class="form-control fs-sm text-muted" id="relatorioDataInicio" style="box-shadow: none;">
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-bold fs-xs text-dark mb-1">Data Final</label>
+                <input type="date" class="form-control fs-sm text-muted" id="relatorioDataFim" style="box-shadow: none;">
               </div>
             </div>
-            <button
-              class="btn btn-dark w-100 py-2 rounded-3 d-flex align-items-center justify-content-center gap-2"
-            >
+
+            <div class="mb-4">
+              <label class="form-label fw-bold fs-xs text-dark mb-1">Colaborador</label>
+              <select class="form-select fs-sm text-muted" id="relatorioColaborador" style="box-shadow: none;">
+                </select>
+            </div>
+
+            <button type="button" class="btn btn-dark w-100 py-2 rounded-3 d-flex align-items-center justify-content-center gap-2" id="btnGerarRelatorio">
               <i class="fa-solid fa-download"></i> Gerar PDF
             </button>
           </div>

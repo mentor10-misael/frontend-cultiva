@@ -1,33 +1,62 @@
-// ==========================================
-// 1. CAMADA DE DADOS (Repository & Sync)
-// ==========================================
+const CloudAPI = {
+    baseURL: 'http://localhost:3000', 
+    
+    agricultorId: "145837fc-ecec-497e-9ef5-7d8c5c4639cc",
 
-// Simula sua API na nuvem (Node.js) e faz a tradução para o formato do Banco SQL
-const FakeCloudAPI = {
-    enviarTransacao: (transacaoFront) => {
-        return new Promise((resolve, reject) => {
-            // Simula delay de rede de 1 segundo
-            setTimeout(() => {
-                // 1. Tradução para o formato do seu Banco de Dados (Diagrama)
-                const payloadBanco = {
-                    tipo: transacaoFront.tipo === 'entrada' ? 'RECEITA' : 'DESPESA',
-                    descricao: transacaoFront.descricao,
-                    valor: transacaoFront.valor,
-                    data: transacaoFront.data,
-                    forma_pagamento: transacaoFront.pagamento, // Campo novo
-                    beneficiario: transacaoFront.pessoa,       // Campo novo
-                    centro_custo_id: transacaoFront.categoria, // Slug (ideal seria ID UUID)
-                    usuario_id: 1
-                };
+    buscarCentrosCusto: async () => {
+        const response = await fetch(`${CloudAPI.baseURL}/centro-custo`);
+        if (!response.ok) throw new Error('Erro ao buscar centros de custo');
+        return await response.json();
+    },
 
-                console.log(`[CLOUD] Sincronizando:`, payloadBanco);
+    criarCentroCusto: async (dadosFront) => {
+        const payload = {
+            nome: dadosFront.nome,
+            descricao: dadosFront.descricao || "",
+            agricultorId: CloudAPI.agricultorId
+        };
 
-                // Simula 10% de chance de erro na rede
-                if (Math.random() > 0.95) reject("Erro de conexão simulado");
-                else resolve({ status: 'ok', idServer: Date.now() });
-            }, 1000);
+        const response = await fetch(`${CloudAPI.baseURL}/centro-custo`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
         });
+
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error || 'Erro ao criar centro de custo');
+        }
+        return await response.json();
+    },
+
+    sincronizarMovimentacoes: async (movimentacoes) => {
+    // Filtra apenas os campos que o Zod espera para evitar lixo no payload
+    const payloadBanco = movimentacoes.map(mov => ({
+        syncId: mov.id, // O ID local agora é um UUID válido
+        tipo: mov.tipo, // 'ENTRADA' ou 'SAIDA'
+        valor: mov.valor,
+        descricao: mov.descricao,
+        dataMovimento: mov.dataMovimento,
+        formaPagamento: mov.formaPagamento,
+        entidade: mov.entidade || undefined, // Zod diz que é optional()
+        centroCustoId: mov.centroCustoId,
+        agricultorId: mov.agricultorId
+    }));
+
+    const response = await fetch(`${CloudAPI.baseURL}/movimentacoes/sync`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payloadBanco) 
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Erro de validação do Zod:", errorData);
+        throw new Error('Falha ao sincronizar dados com o servidor.');
     }
+
+    return await response.json();
+}
 };
 
 const Repository = {
@@ -123,27 +152,55 @@ const SyncService = {
         if(this.isOnline) this.tentarSincronizar();
     },
 
-    tentarSincronizar: async function() {
-        if (!this.isOnline) return;
+    baixarCentrosDeCustoOficiais: async function() {
+        try {
+            const centrosDoBanco = await CloudAPI.buscarCentrosCusto();
+            
+            const centrosFormatados = centrosDoBanco.map(c => ({
+                id: c.id,          // UUID
+                slug: c.id,        // UUID para o <select> usar ele
+                nome: c.nome,
+                descricao: c.descricao,
+                tipo: 'geral',     // 
+                saldo: 0           // Será calculado dinamicamente
+            }));
 
-        const pendentes = Repository.getAllTransacoes().filter(t => t.syncStatus === 'pendente');
-
-        if (pendentes.length === 0) return;
-
-        UI.mostrarCarregandoSync(true);
-
-        for (const item of pendentes) {
-            try {
-                await FakeCloudAPI.enviarTransacao(item);
-                Repository.atualizarStatusSync(item.id, 'sincronizado');
-            } catch (error) {
-                console.error(`Falha ao sincronizar item ${item.id}`, error);
-            }
+            // Sobrescreve as categorias mockadas ("lavoura", "maquinas") pelos dados reais
+            localStorage.setItem(Repository.KEY_CATEGORIAS, JSON.stringify(centrosFormatados));
+            UI.atualizarTela();
+            
+        } catch (error) {
+            console.error("Aviso: Não foi possível baixar os centros de custo atualizados.", error);
         }
+    },
+
+    tentarSincronizar: async function() {
+    if (!this.isOnline) return;
+
+    // Busca todas as transações que ainda não foram enviadas
+    const pendentes = Repository.getAllTransacoes().filter(t => t.syncStatus === 'pendente');
+
+    if (pendentes.length === 0) return;
+
+    UI.mostrarCarregandoSync(true);
+
+    try {
+        // Envia TODAS as pendentes de uma vez só!
+        const resultado = await CloudAPI.sincronizarMovimentacoes(pendentes);
+        console.log(resultado.message); // "Sincronização concluída!"
         
-        UI.mostrarCarregandoSync(false);
-        UI.atualizarTela(); // Atualiza a lista para mostrar os "checks" verdes
+        // Se deu certo, atualiza o status de todas para 'sincronizado' (aparece o check verde)
+        pendentes.forEach(item => {
+            Repository.atualizarStatusSync(item.id, 'sincronizado');
+        });
+
+    } catch (error) {
+        console.error("Falha na sincronização", error);
     }
+    
+    UI.mostrarCarregandoSync(false);
+    UI.atualizarTela();
+}
 };
 
 
@@ -180,6 +237,8 @@ const UI = {
         this.renderizarCentrosDeCusto(dados.centrosDeCusto);
         this.renderizarListaTransacoes(dados.transacoes);
         this.atualizarDropdownCentros(dados.todasCategorias); 
+
+        this.prepararModalRelatorio(dados.todasCategorias, dados.transacoes);
     },
 
     renderizarTotais: function(resumo) {
@@ -313,9 +372,11 @@ const UI = {
     },
 
     configurarEventos: function() {
+        document.getElementById('btnGerarRelatorio')?.addEventListener('click', () => Controlador.gerarRelatorio());
         document.getElementById('inputBusca')?.addEventListener('input', (e) => {
             this.estado.termoBusca = e.target.value.toLowerCase();
             this.atualizarTela();
+
         });
 
         document.getElementById('btnLimparBusca')?.addEventListener('click', () => {
@@ -434,6 +495,45 @@ mudarTipoCentro: function(tipo) {
         btn.className = 'btn btn-geral w-100 py-2 rounded-3 fw-bold transition-all';
     }
 },
+
+    prepararModalRelatorio: function(categorias, transacoes) {
+        const containerCentros = document.getElementById('listaFiltroCentros');
+        const selectColaborador = document.getElementById('relatorioColaborador');
+        if(!containerCentros || !selectColaborador) return;
+
+        // 1. Renderiza os Centros de Custo dinamicamente
+        containerCentros.innerHTML = '';
+        categorias.forEach(cat => {
+            containerCentros.innerHTML += `
+                <input type="checkbox" class="btn-check check-centro-relatorio" id="tagRel_${cat.slug}" value="${cat.slug}" autocomplete="off" checked>
+                <label class="btn btn-outline-secondary rounded-pill fs-xs text-nowrap px-3" for="tagRel_${cat.slug}">${cat.nome}</label>
+            `;
+        });
+
+        // Lógica do switch "Selecionar Todos"
+        const checkTodos = document.getElementById('checkTodosCentros');
+        const checksIndividuais = document.querySelectorAll('.check-centro-relatorio');
+
+        checkTodos.onchange = (e) => {
+            checksIndividuais.forEach(chk => chk.checked = e.target.checked);
+        };
+
+        checksIndividuais.forEach(chk => {
+            chk.onchange = () => {
+                const todosMarcados = Array.from(checksIndividuais).every(c => c.checked);
+                checkTodos.checked = todosMarcados;
+            };
+        });
+
+        // 2. Extrai os colaboradores únicos das transações
+        // Puxando do campo "usuario" (você pode mudar para "pessoa" se preferir)
+        const colaboradoresUnicos = [...new Set(transacoes.map(t => t.usuario).filter(Boolean))];
+        
+        selectColaborador.innerHTML = '<option value="todos" selected>Todos os colaboradores</option>';
+        colaboradoresUnicos.forEach(colab => {
+            selectColaborador.innerHTML += `<option value="${colab}">${colab}</option>`;
+        });
+    },
 };
 
 // ==========================================
@@ -501,34 +601,54 @@ const Controlador = {
     },
 
     salvarTransacao: function() {
-        const tipo = document.getElementById('inputTipoMovimentacao').value;
-        const valor = parseFloat(document.getElementById('inputValor').value);
-        if(isNaN(valor) || valor <= 0) { alert('Digite um valor válido'); return; }
-        
-        const descricao = document.getElementById('inputDescricao').value;
-        const data = document.getElementById('inputData').value;
-        const pagamento = document.getElementById('selectPagamento').value;
-        
-        const select = document.getElementById('selectCentroCusto');
-        const categoria = select.value;
-        const categoriaNome = select.options[select.selectedIndex].text;
-        
-        // Pega a pessoa certa dependendo da aba ativa
-        let pessoa = tipo === 'entrada' 
-            ? document.getElementById('inputQuemPagou').value 
-            : document.getElementById('inputFornecedor').value;
+    const tipoFront = document.getElementById('inputTipoMovimentacao').value; // 'entrada' ou 'saida'
+    const valor = parseFloat(document.getElementById('inputValor').value);
+    
+    if(isNaN(valor) || valor <= 0) { 
+        alert('Digite um valor maior que zero'); 
+        return; 
+    }
+    
+    const descricao = document.getElementById('inputDescricao').value;
+    const dataInput = document.getElementById('inputData').value; 
+    const pagamento = document.getElementById('selectPagamento').value;
+    
+    const select = document.getElementById('selectCentroCusto');
+    const centroCustoId = select.value; // Agora isso é o UUID real
+    const categoriaNome = select.options[select.selectedIndex].text;
+    
+    let entidade = tipoFront === 'entrada' 
+        ? document.getElementById('inputQuemPagou').value 
+        : document.getElementById('inputFornecedor').value;
 
-        const objetoTransacao = {
-            id: this.idEmEdicao || Date.now(), 
-            tipo, valor, descricao, data, pagamento, pessoa, categoria, categoriaNome,
-            usuario: 'Admin'
-        };
+    // Converte a data do input (YYYY-MM-DD) para ISO-8601 (exigência do Zod datetime)
+    // O Zod exige o formato completo com horário, ex: "2026-02-24T00:00:00.000Z"
+    const dataMovimentoISO = new Date(`${dataInput}T00:00:00`).toISOString();
 
-        Repository.salvarTransacao(objetoTransacao);
+    // Cria o objeto da transação misturando dados para a Tela e dados para a API
+    const objetoTransacao = {
+        id: this.idEmEdicao || crypto.randomUUID(), // Gera o syncId (UUID)
+        tipo: tipoFront === 'entrada' ? 'ENTRADA' : 'SAIDA', // Formato Zod
+        valor, 
+        descricao, 
+        data: dataInput, // Mantém para mostrar na tela facilmente
+        dataMovimento: dataMovimentoISO, // Para a API
+        pagamento, // Tela
+        formaPagamento: pagamento, // Zod
+        pessoa: entidade, // Tela
+        entidade: entidade, // Zod
+        categoria: centroCustoId, // Tela vincula com o <select>
+        centroCustoId: centroCustoId, // Zod
+        categoriaNome, 
+        usuario: 'Admin',
+        agricultorId: CloudAPI.agricultorId // Pega o ID temporário que definimos
+    };
 
-        bootstrap.Modal.getInstance(document.getElementById('modalNovaMovimentacao')).hide();
-        UI.atualizarTela();
-    },
+    Repository.salvarTransacao(objetoTransacao);
+
+    bootstrap.Modal.getInstance(document.getElementById('modalNovaMovimentacao')).hide();
+    UI.atualizarTela();
+},
 
     excluirTransacao: function() {
         if(confirm('Deseja excluir esta movimentação?')) {
@@ -594,8 +714,7 @@ const Controlador = {
         UI.atualizarTela();
     },
 
-    salvarNovoCentro: function() {
-    // Dados Comuns
+    salvarNovoCentro: async function() {
     const nome = document.getElementById('inputNomeCentro').value;
     const descricao = document.getElementById('inputDescricaoCentro').value;
     const tipoEl = document.querySelector('input[name="tipoCentro"]:checked');
@@ -603,38 +722,46 @@ const Controlador = {
 
     if (!nome) return;
 
-    // Objeto base
-    let novoCentro = {
-        id: Date.now(), // ID único temporário
-        slug: nome.toLowerCase().trim().replace(/ /g, '-').replace(/[^\w-]+/g, ''),
-        nome,
-        descricao,
-        tipo,
-        saldo: 0
-    };
-
-    // Pega dados específicos baseado no tipo
-    if (tipo === 'lavoura') {
-        novoCentro.area = document.getElementById('inputArea').value;
-        novoCentro.unidade = document.getElementById('inputUnidade').value;
-        novoCentro.cultura = document.getElementById('inputCultura').value;
-    } else if (tipo === 'maquinas') {
-        novoCentro.modelo = document.getElementById('inputModelo').value;
-        novoCentro.ano = document.getElementById('inputAno').value;
-        novoCentro.serial = document.getElementById('inputSerial').value;
+    // Verifica se tem internet (não deixamos criar Categoria offline para evitar conflitos de ID)
+    if (!SyncService.isOnline) {
+        alert("Você precisa de conexão com a internet para criar um novo Centro de Custo.");
+        return;
     }
 
-    // Salva no Repository
-    Repository.adicionarCategoria(novoCentro);
+    // Muda o texto do botão para dar feedback pro usuário
+    const btn = document.getElementById('btnCriarCentro');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...';
+    btn.disabled = true;
 
-    // Fecha modal e limpa
-    bootstrap.Modal.getInstance(document.getElementById('modalNovoCentro')).hide();
-    document.getElementById('formNovoCentro').reset();
-    
-    // Reseta visual para o padrão (Lavoura)
-    UI.mudarTipoCentro('lavoura'); 
-    
-    UI.atualizarTela();
+    try {
+        // Manda pro Back-end real
+        const novoCentroDB = await CloudAPI.criarCentroCusto({ nome, descricao });
+
+        const centroFront = {
+            id: novoCentroDB.id, // UUID gerado pelo banco
+            slug: novoCentroDB.id, // Usado no <select> de transações
+            nome: novoCentroDB.nome,
+            descricao: novoCentroDB.descricao,
+            tipo: tipo,
+            saldo: 0
+        };
+
+        // Salva localmente
+        Repository.adicionarCategoria(centroFront);
+
+        // Limpa e fecha Modal
+        bootstrap.Modal.getInstance(document.getElementById('modalNovoCentro')).hide();
+        document.getElementById('formNovoCentro').reset();
+        UI.mudarTipoCentro('lavoura'); 
+        UI.atualizarTela();
+
+    } catch (error) {
+        alert(error.message);
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
 },
     
     abrirDetalhes: function(id) {
@@ -674,8 +801,138 @@ const Controlador = {
         }
 
         new bootstrap.Modal(document.getElementById('modalDetalhes')).show();
-    }
-};
+    },
+
+   gerarRelatorio: function() {
+        // 1. Captura os filtros do Modal
+        const dataInicio = document.getElementById('relatorioDataInicio').value;
+        const dataFim = document.getElementById('relatorioDataFim').value;
+        const colaborador = document.getElementById('relatorioColaborador').value;
+        
+        const checksCentros = document.querySelectorAll('.check-centro-relatorio:checked');
+        const centrosSelecionados = Array.from(checksCentros).map(chk => chk.value);
+
+        if(centrosSelecionados.length === 0) {
+            alert('Por favor, selecione pelo menos um Centro de Custo.');
+            return;
+        }
+
+        if(dataInicio && dataFim && dataInicio > dataFim) {
+            alert('A data inicial não pode ser maior que a data final.');
+            return;
+        }
+
+        // 2. Puxa as transações do Repository e aplica os filtros
+        let transacoesFiltradas = Repository.getAllTransacoes().filter(t => {
+            // Filtra por Centro de Custo
+            if (!centrosSelecionados.includes(t.categoria)) return false;
+
+            // Filtra por Data
+            if (dataInicio && t.data < dataInicio) return false;
+            if (dataFim && t.data > dataFim) return false;
+
+            // Filtra por Colaborador (ajuste para t.pessoa se for usar o campo de fornecedor/cliente)
+            if (colaborador !== 'todos' && t.usuario !== colaborador) return false;
+
+            return true;
+        });
+
+        if (transacoesFiltradas.length === 0) {
+            alert('Nenhuma movimentação encontrada para o período e filtros selecionados.');
+            return;
+        }
+
+        // Ordena da mais antiga para a mais nova no relatório
+        transacoesFiltradas.sort((a, b) => new Date(a.data) - new Date(b.data));
+
+        // 3. Inicializa o jsPDF
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Cabeçalho do PDF
+        doc.setFontSize(18);
+        doc.setTextColor(15, 81, 50); // Verde Cultiva
+        doc.text('Relatório de Custos - Cultiva', 14, 20);
+
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        let subtitulo = `Período: ${dataInicio ? dataInicio.split('-').reverse().join('/') : 'Início'} até ${dataFim ? dataFim.split('-').reverse().join('/') : 'Hoje'}`;
+        doc.text(subtitulo, 14, 28);
+        doc.text(`Colaborador: ${colaborador === 'todos' ? 'Todos' : colaborador}`, 14, 34);
+
+        // 4. Prepara os dados para a tabela
+        let totalEntradas = 0;
+        let totalSaidas = 0;
+
+        const dadosTabela = transacoesFiltradas.map(t => {
+            const dataFormatada = t.data.split('-').reverse().join('/');
+            const valorFormatado = UI.formatarMoeda(t.valor);
+            
+            if (t.tipo === 'entrada') {
+                totalEntradas += t.valor;
+            } else {
+                totalSaidas += t.valor;
+            }
+
+            // Adicionamos t.pagamento aqui na 4ª posição (índice 3)
+            return [
+                dataFormatada, 
+                t.descricao, 
+                t.categoriaNome, 
+                t.pagamento || '-', // <-- Forma de pagamento adicionada aqui
+                t.tipo === 'entrada' ? 'Entrada' : 'Saída', 
+                t.tipo === 'entrada' ? valorFormatado : `- ${valorFormatado}`
+            ];
+        });
+
+        const saldoFinal = totalEntradas - totalSaidas;
+
+        // 5. Desenha a tabela usando o autoTable
+        doc.autoTable({
+            startY: 42,
+            // Adicionamos 'Pagamento' no cabeçalho
+            head: [['Data', 'Descrição', 'Centro de Custo', 'Pagamento', 'Tipo', 'Valor']],
+            body: dadosTabela,
+            theme: 'striped',
+            headStyles: { fillColor: [25, 135, 84] }, 
+            alternateRowStyles: { fillColor: [248, 249, 250] },
+            didParseCell: function(data) {
+                // Como adicionamos uma coluna, o 'Valor' agora é o índice 5 e o 'Tipo' é o índice 4
+                if (data.section === 'body' && data.column.index === 5) {
+                    if (data.row.raw[4] === 'Entrada') {
+                        data.cell.styles.textColor = [25, 135, 84]; // Verde
+                    } else {
+                        data.cell.styles.textColor = [220, 53, 69]; // Vermelho
+                    }
+                }
+            }
+        });
+
+        // 6. Desenha o rodapé com os totais
+        const finalY = doc.lastAutoTable.finalY || 42;
+        doc.setFontSize(11);
+        doc.setTextColor(50, 50, 50);
+        
+        doc.text(`Total de Entradas: ${UI.formatarMoeda(totalEntradas)}`, 14, finalY + 10);
+        doc.text(`Total de Saídas: ${UI.formatarMoeda(totalSaidas)}`, 14, finalY + 16);
+        
+        doc.setFont("helvetica", "bold");
+        if(saldoFinal >= 0) {
+            doc.setTextColor(25, 135, 84);
+        } else {
+            doc.setTextColor(220, 53, 69);
+        }
+        doc.text(`Saldo do Período: ${UI.formatarMoeda(saldoFinal)}`, 14, finalY + 24);
+
+        // 7. Salva o arquivo e fecha o modal
+        doc.save(`Cultiva_Relatorio_${new Date().getTime()}.pdf`);
+        
+        const modalEl = document.getElementById('modalRelatorio');
+        if(modalEl) {
+            bootstrap.Modal.getInstance(modalEl).hide();
+        }
+    },
+}
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
