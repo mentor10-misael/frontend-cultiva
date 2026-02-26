@@ -223,7 +223,56 @@
     <div class="sheet-mao"></div>
 
     <div class="sheet-container">
+      <h3>Novo Evento</h3>
 
+      <form id="form-evento">
+        <div class="secao-tipo">
+          <p>Tipo</p>
+          <div class="radio-container">
+            <div class="selecao-bg"></div>
+
+            <label class="radio-opcao">
+              <input type="radio" name="tipo" value="atividades" checked>
+              <span>Atividades Realizadas</span>
+            </label>
+
+            <label class="radio-opcao">
+              <input type="radio" name="tipo" value="lembretes">
+              <span>Lembretes</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="campo-linha">
+          <div class="campo-grupo">
+            <label for="data">Data</label>
+            <input type="date" id="data" required>
+          </div>
+
+          <div class="campo-grupo">
+            <label for="hora">Hora</label>
+            <input type="time" id="hora" required>
+          </div>
+        </div>
+
+        <div class="campo-grupo">
+          <label for="titulo-evento">O que foi feito?</label>
+          <input type="text" id="titulo-evento" name="titulo" placeholder="Ex: Aplicar inseticida" required>
+        </div>
+
+        <div class="campo-grupo">
+          <label for="repetir">Repetir evento?</label>
+          <select name="repetir" id="repetir" class="input-selecionar">
+            <option value="" disabled selected>Selecione uma opção</option>
+            <option value="nao">Não repetir</option>
+            <option value="nao">Todos os dias</option>
+            <option value="nao">Semanalmente</option>
+            <option value="nao">Mensalmente</option>
+            <option value="nao">Anualmente</option>
+          </select>
+        </div>
+        <button type="submit" id="close-sheet" class="botao-principal">Salvar</button>
+      </form>
     </div>
   </div>
 

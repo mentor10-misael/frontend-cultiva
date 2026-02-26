@@ -9,3 +9,4 @@
 /* CALENDARIO */
 @import "./pages/calendario/calendario.css";
 @import "./pages/calendario/agenda-dia.css";
+@import "./pages/calendario/novo-evento.css";
