@@ -55,3 +55,49 @@ input[type="checkbox"]:checked + .tarefas-conteudo input {
 .tarefas-relogio span {
   font-size: 0.75rem;
 }
+
+.tarefas-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  padding: 1rem;
+  background: #fff;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.menu-lista {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 2;
+  min-width: 180px;
+  padding: 0.625rem;
+}
+
+.menu-lista.active {
+  display: block;
+}
+
+.menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  font-size: 1rem;
+  text-align: left;
+}
+
+.menu-item:active {
+  background-color: #f5f5f5;
+}
+
+.botao-excluir {
+  color: #e7000b;
+}
