@@ -104,6 +104,10 @@ body {
   border-color: #82d6a6;
 }
 
+.footer-icon-hover:hover {
+  color: #065f46;
+}
+
 /* Ajustes para telas até 490px */
 @media (max-width: 490px) {
   .invoice-number {
