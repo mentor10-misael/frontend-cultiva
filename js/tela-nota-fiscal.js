@@ -1,5 +1,9 @@
 const invoices = [];
 
+function resetForm() {
+  document.querySelector("#register-form").reset();
+}
+
 document.getElementById("register-form").addEventListener("submit", (ev) => {
   ev.preventDefault();
 
@@ -15,12 +19,12 @@ document.getElementById("register-form").addEventListener("submit", (ev) => {
     invoiceType = "entrada";
   }
 
-  const invoiceNumber = document.getElementById("invoiceNumber").value;
-  const invoiceIssueDate = document.getElementById("invoiceIssueDate").value;
-  const invoiceValue = document.getElementById("invoiceValue").value;
-  const description = document.getElementById("description").value;
-  const costCenter = document.getElementById("costCenter").value;
-  const fileUpload = document.getElementById("fileUpload").value;
+  let invoiceNumber = document.getElementById("invoiceNumber").value;
+  let invoiceIssueDate = document.getElementById("invoiceIssueDate").value;
+  let invoiceValue = document.getElementById("invoiceValue").value;
+  let description = document.getElementById("description").value;
+  let costCenter = document.getElementById("costCenter").value;
+  let fileUpload = document.getElementById("fileUpload").value;
 
   const formResponse = {
     invoiceType,
@@ -31,6 +35,10 @@ document.getElementById("register-form").addEventListener("submit", (ev) => {
     costCenter,
     fileUpload,
   };
+
   invoices.push(formResponse);
-  console.log(invoices);
+
+  localStorage.setItem("Notas armazenadas", JSON.stringify(invoices));
+
+  resetForm();
 });
