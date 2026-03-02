@@ -88,7 +88,7 @@ function renderInvoices() {
             
             <div class="text-end">
               <div class="fw-bold ${valueColor} invoice-value" style="font-size: 1.1rem">
-                ${invoice.invoiceValue}
+                R$ ${invoice.invoiceValue}
               </div>
               <small class="text-muted" style="font-size: 0.75rem">${invoice.invoiceIssueDate}</small>
             </div>
