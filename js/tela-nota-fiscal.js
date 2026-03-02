@@ -5,12 +5,13 @@ document.getElementById("register-form").addEventListener("submit", (ev) => {
 
   let invoiceType = "";
 
-  const invoiceTypeOut = document.getElementById("invoiceTypeOut").checked;
-  const invoiceTypeIn = document.getElementById("invoiceTypeIn").checked;
+  const invoiceTypeOut = document.getElementById("invoiceTypeOut");
 
-  if (invoiceTypeOut) {
+  const invoiceTypeIn = document.getElementById("invoiceTypeIn");
+
+  if (invoiceTypeOut.checked) {
     invoiceType = "saída";
-  } else if (invoiceTypeIn) {
+  } else if (invoiceTypeIn.checked) {
     invoiceType = "entrada";
   }
 

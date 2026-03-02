@@ -41,6 +41,12 @@ body {
   border-color: #82d6a6;
   color: #065f46;
 }
+
+.type-selector .btn-check:checked + .btn-outline-secondary {
+  background-color: #f97474;
+  border-color: #ff4747;
+  color: #f31a1a;
+}
 .type-selector .btn {
   border-radius: 12px;
   padding: 12px;
