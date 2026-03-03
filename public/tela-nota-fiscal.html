@@ -213,7 +213,7 @@
                         />
                       </div>
 
-                      <!--Verificar se é possível colocar esse centro de custo como um select-->
+                      <!--Verificar se é possível colocar esse centro de custo como um select e verificar a questão da integração dessa parte com o backend-->
                       <div class="mb-3">
                         <label for="costCenter" class="form-label"
                           >Centro de Custo</label
@@ -355,104 +355,7 @@
           </div>
           <!--Área do titulo e do filtro de notas fiscais-->
           <div id="invoice-list">
-            <div class="invoice-card mx-n3">
-              <div
-                class="d-flex justify-content-between align-items-start mb-2"
-              >
-                <div class="d-flex gap-3">
-                  <div class="icon-box bg-success-subtle text-success">
-                    <i class="bi bi-arrow-up-right"></i>
-                  </div>
-                  <div>
-                    <div class="d-flex align-items-center gap-1 flex-wrap">
-                      <span class="fw-bold invoice-number">NF-1023</span>
-                      <span class="badge badge-admin rounded-pill">Admin</span>
-                      <span class="badge badge-pending rounded-pill"
-                        >PENDENTE</span
-                      >
-                    </div>
-                    <div class="fw-medium mt-1" style="font-size: 0.95rem">
-                      Venda de Soja - Coop
-                    </div>
-                    <small class="text-muted d-block">Vendas & Comercial</small>
-                  </div>
-                </div>
-                <div class="text-end">
-                  <div
-                    class="fw-bold text-success invoice-value"
-                    style="font-size: 1.1rem"
-                  >
-                    R$ 15.000,00
-                  </div>
-                  <small class="text-muted" style="font-size: 0.75rem"
-                    >24/10/2023</small
-                  >
-                </div>
-              </div>
-              <div
-                class="d-flex justify-content-between align-items-center mt-3"
-              >
-                <div
-                  class="d-flex align-items-center gap-2 text-muted-custom"
-                  style="font-size: 0.85rem"
-                >
-                  <input type="checkbox" class="form-check-input m-0" />
-                  <span>Marcar recebimento</span>
-                </div>
-                <i
-                  class="bi bi-trash3 text-light-emphasis"
-                  style="cursor: pointer"
-                ></i>
-              </div>
-            </div>
-
-            <div class="invoice-card mx-n3">
-              <div
-                class="d-flex justify-content-between align-items-start mb-2"
-              >
-                <div class="d-flex gap-3">
-                  <div class="icon-box bg-danger-subtle text-danger">
-                    <i class="bi bi-arrow-down-left"></i>
-                  </div>
-                  <div>
-                    <div class="d-flex align-items-center gap-1 flex-wrap">
-                      <span class="fw-bold invoice-number">NF-5501</span>
-                      <span class="badge badge-admin rounded-pill">Admin</span>
-                    </div>
-                    <div class="fw-medium mt-1" style="font-size: 0.95rem">
-                      Compra de Defensivos
-                    </div>
-                    <small class="text-muted d-block">Insumos Agrícolas</small>
-                  </div>
-                </div>
-                <div class="text-end">
-                  <div
-                    class="fw-bold text-danger invoice-value"
-                    style="font-size: 1.1rem"
-                  >
-                    R$ 2.300,50
-                  </div>
-                  <small class="text-muted" style="font-size: 0.75rem"
-                    >19/10/2023</small
-                  >
-                </div>
-              </div>
-              <div
-                class="d-flex justify-content-between align-items-center mt-3"
-              >
-                <div
-                  class="d-flex align-items-center gap-2 text-success"
-                  style="font-size: 0.85rem"
-                >
-                  <i class="bi bi-check-circle-fill"></i>
-                  <span class="fw-medium">Contra Nota Recebida</span>
-                </div>
-                <i
-                  class="bi bi-trash3 text-light-emphasis"
-                  style="cursor: pointer"
-                ></i>
-              </div>
-            </div>
+            <!--As notas serão renderizadas aqui-->
           </div>
         </div>
       </section>
@@ -479,6 +382,57 @@
         </div>
       </div>
     </footer>
+    <div
+      class="modal fade"
+      id="deleteInvoiceModal"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5">Remoção de Nota Fiscal</h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p>
+              Você está prestes a remover a nota:
+              <strong id="modal-invoice-display"></strong>
+            </p>
+            <form id="delete-invoice-form">
+              <label class="form-label">Confirme o número da nota:</label>
+              <input
+                type="text"
+                class="form-control"
+                id="confirm-invoice-input"
+              />
+
+              <div class="modal-footer d-flex flex-row-reverse pb-0 mt-3">
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  data-bs-dismiss="modal"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-success"
+                  id="btn-confirm-delete"
+                >
+                  Confirmar Remoção
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"

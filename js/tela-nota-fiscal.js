@@ -99,7 +99,15 @@ function renderInvoices() {
               <input type="checkbox" class="form-check-input m-0" />
               <span>Marcar recebimento</span>
             </div>
-            <i class="bi bi-trash3 text-light-emphasis" style="cursor: pointer"></i>
+            <button
+              type="button"
+              class="border border-0 bg-transparent"
+              data-bs-toggle="modal"
+              data-bs-target="#deleteInvoiceModal"
+              data-bs-invoice="${invoice.invoiceNumber}"
+            >
+            <i class="bi bi-trash3 text-light-emphasis"></i>
+            </button>
           </div>
         </div>`;
     }
@@ -107,3 +115,27 @@ function renderInvoices() {
   }
 }
 renderInvoices();
+
+// Lógica para deletar uma nota fiscal da tela
+const deleteModal = document.getElementById("deleteInvoiceModal");
+
+// Evento disparado pelo Bootstrap SEMPRE que o modal vai abrir
+deleteModal.addEventListener("show.bs.modal", function (event) {
+  // O botão que foi clicado
+  const button = event.relatedTarget;
+
+  // Extrai o número da nota do atributo data-bs-invoice
+  const invoiceNumber = button.getAttribute("data-bs-invoice");
+
+  // Atualiza os elementos dentro do modal de exclusão da nota fiscal
+  const displaySpan = deleteModal.querySelector("#modal-invoice-display");
+  const inputConfirm = deleteModal.querySelector("#confirm-invoice-input");
+
+  displaySpan.textContent = invoiceNumber; // Mostra o número no título/texto
+  inputConfirm.value = ""; // Limpa o input para uma nova tentativa
+  inputConfirm.placeholder = `Ex: ${invoiceNumber}`;
+
+  // Salva o número num atributo do botão de confirmar para uso posterior
+  const confirmBtn = deleteModal.querySelector("#btn-confirm-delete");
+  confirmBtn.setAttribute("data-current-invoice", invoiceNumber);
+});
