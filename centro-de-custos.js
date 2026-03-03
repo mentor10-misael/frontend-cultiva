@@ -31,9 +31,9 @@ const CloudAPI = {
 
     sincronizarMovimentacoes: async (movimentacoes) => {
     // Filtra apenas os campos que o Zod espera para evitar lixo no payload
-    const payloadBanco = movimentacoes.map(mov => ({
-        syncId: mov.id, // O ID local agora é um UUID válido
-        tipo: mov.tipo, // 'ENTRADA' ou 'SAIDA'
+        const payloadBanco = movimentacoes.map(mov => ({
+        syncId: mov.id, 
+        tipo: mov.tipo.toUpperCase(),
         valor: mov.valor,
         descricao: mov.descricao,
         dataMovimento: mov.dataMovimento,
@@ -340,7 +340,7 @@ const UI = {
             const nomeUsuario = t.usuario || 'Sistema';
 
             const html = `
-                <div class="card card-transaction cursor-pointer mb-2" onclick="Controlador.abrirDetalhes(${t.id})">
+                <div class="card card-transaction cursor-pointer mb-2" onclick="Controlador.abrirDetalhes('${t.id}')">
                   <div class="card-body p-3 d-flex justify-content-between align-items-center ${corBorda}">
                     <div class="d-flex flex-column gap-1">
                       
@@ -626,10 +626,10 @@ const Controlador = {
     const dataMovimentoISO = new Date(`${dataInput}T00:00:00`).toISOString();
 
     // Cria o objeto da transação misturando dados para a Tela e dados para a API
-    const objetoTransacao = {
-        id: this.idEmEdicao || crypto.randomUUID(), // Gera o syncId (UUID)
-        tipo: tipoFront === 'entrada' ? 'ENTRADA' : 'SAIDA', // Formato Zod
-        valor, 
+        const objetoTransacao = {
+        id: this.idEmEdicao || crypto.randomUUID(), 
+        tipo: tipoFront, // Mantém 'entrada' ou 'saida' minúsculo pro front-end funcionar
+        valor,
         descricao, 
         data: dataInput, // Mantém para mostrar na tela facilmente
         dataMovimento: dataMovimentoISO, // Para a API
@@ -646,28 +646,32 @@ const Controlador = {
 
     Repository.salvarTransacao(objetoTransacao);
 
-    bootstrap.Modal.getInstance(document.getElementById('modalNovaMovimentacao')).hide();
+    const modalNova = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalNovaMovimentacao')); modalNova.hide();    
     UI.atualizarTela();
 },
 
     excluirTransacao: function() {
         if(confirm('Deseja excluir esta movimentação?')) {
             Repository.removerTransacao(this.idEmEdicao);
-            bootstrap.Modal.getInstance(document.getElementById('modalDetalhes')).hide();
+            
+            // Fecha o modal garantindo que a instância existe
+            const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalDetalhes'));
+            modal.hide();
+            
             UI.atualizarTela();
         }
     },
     
     prepararEdicao: function() {
-        // Agora busca do Repository
         const todas = Repository.getAllTransacoes(); 
         const transacao = todas.find(t => t.id === this.idEmEdicao);
         if(!transacao) return;
 
-        // Fecha modal de detalhes e prepara o de edição
-        const modalDetalhes = bootstrap.Modal.getInstance(document.getElementById('modalDetalhes'));
-        if(modalDetalhes) modalDetalhes.hide();
+        // Fecha o modal de detalhes com segurança antes de abrir o próximo
+        const modalDetalhes = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalDetalhes'));
+        modalDetalhes.hide();
         
+        // Preenche os dados no formulário
         document.getElementById('inputTipoMovimentacao').value = transacao.tipo;
         document.getElementById('inputValor').value = transacao.valor;
         document.getElementById('inputDescricao').value = transacao.descricao;
@@ -676,13 +680,16 @@ const Controlador = {
         document.getElementById('selectCentroCusto').value = transacao.categoria;
 
         if (transacao.tipo === 'entrada') {
-            document.getElementById('inputQuemPagou').value = transacao.pessoa;
+            document.getElementById('inputQuemPagou').value = transacao.pessoa || '';
         } else {
-            document.getElementById('inputFornecedor').value = transacao.pessoa;
+            document.getElementById('inputFornecedor').value = transacao.pessoa || '';
         }
 
         UI.toggleTipoModal(transacao.tipo);
-        new bootstrap.Modal(document.getElementById('modalNovaMovimentacao')).show();
+        
+        // Abre o modal de edição corretamente
+        const modalNova = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalNovaMovimentacao'));
+        modalNova.show();
     },
 
     prepararNova: function() {
@@ -751,8 +758,7 @@ const Controlador = {
         Repository.adicionarCategoria(centroFront);
 
         // Limpa e fecha Modal
-        bootstrap.Modal.getInstance(document.getElementById('modalNovoCentro')).hide();
-        document.getElementById('formNovoCentro').reset();
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modalNovoCentro')).hide();        document.getElementById('formNovoCentro').reset();
         UI.mudarTipoCentro('lavoura'); 
         UI.atualizarTela();
 
