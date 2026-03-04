@@ -809,11 +809,13 @@ const Controlador = {
         new bootstrap.Modal(document.getElementById('modalDetalhes')).show();
     },
 
-   gerarRelatorio: function() {
-        // 1. Captura os filtros do Modal
+   gerarRelatorio: async function() {
+        // 1. Captura os filtros
         const dataInicio = document.getElementById('relatorioDataInicio').value;
         const dataFim = document.getElementById('relatorioDataFim').value;
         const colaborador = document.getElementById('relatorioColaborador').value;
+        const formato = document.getElementById('relatorioFormato').value;
+        const incluirGrafico = document.getElementById('checkIncluirGrafico').checked;
         
         const checksCentros = document.querySelectorAll('.check-centro-relatorio:checked');
         const centrosSelecionados = Array.from(checksCentros).map(chk => chk.value);
@@ -823,120 +825,264 @@ const Controlador = {
             return;
         }
 
-        if(dataInicio && dataFim && dataInicio > dataFim) {
-            alert('A data inicial não pode ser maior que a data final.');
-            return;
-        }
-
-        // 2. Puxa as transações do Repository e aplica os filtros
+        // 2. Filtra os dados
         let transacoesFiltradas = Repository.getAllTransacoes().filter(t => {
-            // Filtra por Centro de Custo
             if (!centrosSelecionados.includes(t.categoria)) return false;
-
-            // Filtra por Data
             if (dataInicio && t.data < dataInicio) return false;
             if (dataFim && t.data > dataFim) return false;
-
-            // Filtra por Colaborador (ajuste para t.pessoa se for usar o campo de fornecedor/cliente)
             if (colaborador !== 'todos' && t.usuario !== colaborador) return false;
-
             return true;
         });
 
         if (transacoesFiltradas.length === 0) {
-            alert('Nenhuma movimentação encontrada para o período e filtros selecionados.');
+            alert('Nenhuma movimentação encontrada para o período selecionado.');
             return;
         }
 
-        // Ordena da mais antiga para a mais nova no relatório
         transacoesFiltradas.sort((a, b) => new Date(a.data) - new Date(b.data));
 
-        // 3. Inicializa o jsPDF
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        // Cabeçalho do PDF
-        doc.setFontSize(18);
-        doc.setTextColor(15, 81, 50); // Verde Cultiva
-        doc.text('Relatório de Custos - Cultiva', 14, 20);
-
-        doc.setFontSize(10);
-        doc.setTextColor(100, 100, 100);
-        let subtitulo = `Período: ${dataInicio ? dataInicio.split('-').reverse().join('/') : 'Início'} até ${dataFim ? dataFim.split('-').reverse().join('/') : 'Hoje'}`;
-        doc.text(subtitulo, 14, 28);
-        doc.text(`Colaborador: ${colaborador === 'todos' ? 'Todos' : colaborador}`, 14, 34);
-
-        // 4. Prepara os dados para a tabela
+        // 3. Cálculos Avançados (Total, Lucro por Centro e Despesas por Centro)
         let totalEntradas = 0;
         let totalSaidas = 0;
+        const lucrosPorCentro = {};
+        const despesasPorCentro = {};
 
-        const dadosTabela = transacoesFiltradas.map(t => {
-            const dataFormatada = t.data.split('-').reverse().join('/');
-            const valorFormatado = UI.formatarMoeda(t.valor);
-            
+        transacoesFiltradas.forEach(t => {
+            // Inicia zerado se não existir no objeto
+            if (!lucrosPorCentro[t.categoriaNome]) lucrosPorCentro[t.categoriaNome] = 0;
+            if (!despesasPorCentro[t.categoriaNome]) despesasPorCentro[t.categoriaNome] = 0;
+
             if (t.tipo === 'entrada') {
                 totalEntradas += t.valor;
+                lucrosPorCentro[t.categoriaNome] += t.valor;
             } else {
                 totalSaidas += t.valor;
+                lucrosPorCentro[t.categoriaNome] -= t.valor;
+                despesasPorCentro[t.categoriaNome] += t.valor;
+            }
+        });
+
+        // 4. Prepara o Subtítulo
+        const strPeriodo = `Período: ${dataInicio ? dataInicio.split('-').reverse().join('/') : 'Início'} até ${dataFim ? dataFim.split('-').reverse().join('/') : 'Hoje'}`;
+        const strColaborador = `Colaborador: ${colaborador === 'todos' ? 'Todos' : colaborador}`;
+        document.getElementById('rfSubtitulo').innerText = `${strPeriodo} | ${strColaborador}`;
+
+        // 5. Lida com os Gráficos (Chart.js)
+        const canvasBarras = document.getElementById('canvasGraficoBarras');
+        const canvasPizza = document.getElementById('canvasGraficoPizza');
+        const graficosContainer = document.getElementById('rfGraficosContainer');
+        
+        if(window.graficoBarras) window.graficoBarras.destroy();
+        if(window.graficoPizza) window.graficoPizza.destroy();
+
+        if (incluirGrafico && (totalEntradas > 0 || totalSaidas > 0)) {
+            graficosContainer.style.display = 'flex';
+
+            // --- GRÁFICO 1: Barras (Entradas vs Saídas Gerais) ---
+            window.graficoBarras = new Chart(canvasBarras, {
+                type: 'bar',
+                data: {
+                    labels: ['Balanço Geral'],
+                    datasets: [
+                        { label: 'Entradas', data: [totalEntradas], backgroundColor: '#198754' },
+                        { label: 'Saídas', data: [totalSaidas], backgroundColor: '#dc3545' }
+                    ]
+                },
+                options: { 
+                    animation: false,
+                    plugins: { 
+                        title: { display: true, text: 'Entradas vs Saídas', font: { size: 16 } },
+                        legend: { display: true } 
+                    },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+
+            // --- GRÁFICO 2: Pizza (Despesas por Centro de Custo) ---
+            const labelsDespesas = Object.keys(despesasPorCentro).filter(k => despesasPorCentro[k] > 0);
+            const dataDespesas = labelsDespesas.map(k => despesasPorCentro[k]);
+            const paletaCores = ['#f6c23e', '#e74a3b', '#4e73df', '#1cc88a', '#36b9cc', '#858796', '#fd7e14', '#6f42c1'];
+
+            if (dataDespesas.length > 0) {
+                canvasPizza.style.display = 'block';
+                window.graficoPizza = new Chart(canvasPizza, {
+                    type: 'pie',
+                    data: {
+                        labels: labelsDespesas,
+                        datasets: [{ data: dataDespesas, backgroundColor: paletaCores, borderWidth: 1, borderColor: '#fff' }]
+                    },
+                    options: { 
+                        animation: false,
+                        plugins: { title: { display: true, text: 'Despesas Por Centro de Custo', font: { size: 16 } } }
+                    }
+                });
+            } else {
+                canvasPizza.style.display = 'none';
             }
 
-            // Adicionamos t.pagamento aqui na 4ª posição (índice 3)
-            return [
-                dataFormatada, 
+        } else {
+            graficosContainer.style.display = 'none';
+        }
+
+        // Aguarda renderização dos canvas
+        await new Promise(r => setTimeout(r, 150)); 
+
+        // 6. Gera PDF ou PNG
+        // 6. Gera PDF ou PNG
+        if (formato === 'pdf') {
+            const { jsPDF } = window.jspdf;
+            // PDF paisagem (A4 horizontal: 297mm x 210mm)
+            const doc = new jsPDF('landscape'); 
+            
+            // Título
+            doc.setFontSize(22);
+            doc.setTextColor(15, 81, 50);
+            doc.text('Relatório de Custos - Cultiva', 14, 20);
+            
+            // Subtítulo
+            doc.setFontSize(11);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`${strPeriodo} | ${strColaborador}`, 14, 28);
+
+            let startY = 38;
+
+            if (incluirGrafico) {
+                // Tamanho fixo e seguro (120 de largura por 80 de altura)
+                // Isso garante a proporção de 3:2 que usamos no HTML (450x300), 
+                // evitando qualquer achatamento independente do monitor.
+                const larguraGrafico = 120;
+                const alturaGrafico = 80;
+                
+                // Gráfico 1 (Barras)
+                const imgBarras = canvasBarras.toDataURL('image/png', 1.0);
+                doc.addImage(imgBarras, 'PNG', 14, startY, larguraGrafico, alturaGrafico);
+                
+                // Gráfico 2 (Pizza)
+                const labelsDespesas = Object.keys(despesasPorCentro).filter(k => despesasPorCentro[k] > 0);
+                if (labelsDespesas.length > 0) {
+                    const imgPizza = canvasPizza.toDataURL('image/png', 1.0);
+                    // Coloca o segundo gráfico mais pra direita (posição X: 160)
+                    doc.addImage(imgPizza, 'PNG', 160, startY, larguraGrafico, alturaGrafico);
+                }
+                
+                // Empurra a tabela para começar abaixo dos gráficos
+                startY += alturaGrafico + 15; 
+            }
+
+            // Tabela 
+            const dadosTabela = transacoesFiltradas.map(t => [
+                t.data.split('-').reverse().join('/'), 
                 t.descricao, 
                 t.categoriaNome, 
-                t.pagamento || '-', // <-- Forma de pagamento adicionada aqui
-                t.tipo === 'entrada' ? 'Entrada' : 'Saída', 
-                t.tipo === 'entrada' ? valorFormatado : `- ${valorFormatado}`
-            ];
-        });
+                t.pagamento || '-', 
+                t.tipo === 'entrada' ? UI.formatarMoeda(t.valor) : `- ${UI.formatarMoeda(t.valor)}`
+            ]);
 
-        const saldoFinal = totalEntradas - totalSaidas;
-
-        // 5. Desenha a tabela usando o autoTable
-        doc.autoTable({
-            startY: 42,
-            // Adicionamos 'Pagamento' no cabeçalho
-            head: [['Data', 'Descrição', 'Centro de Custo', 'Pagamento', 'Tipo', 'Valor']],
-            body: dadosTabela,
-            theme: 'striped',
-            headStyles: { fillColor: [25, 135, 84] }, 
-            alternateRowStyles: { fillColor: [248, 249, 250] },
-            didParseCell: function(data) {
-                // Como adicionamos uma coluna, o 'Valor' agora é o índice 5 e o 'Tipo' é o índice 4
-                if (data.section === 'body' && data.column.index === 5) {
-                    if (data.row.raw[4] === 'Entrada') {
-                        data.cell.styles.textColor = [25, 135, 84]; // Verde
-                    } else {
-                        data.cell.styles.textColor = [220, 53, 69]; // Vermelho
+            doc.autoTable({
+                startY: startY,
+                head: [['Data', 'Descrição', 'Centro de Custo', 'Pagamento', 'Valor']],
+                body: dadosTabela,
+                theme: 'striped',
+                headStyles: { 
+                    fillColor: [25, 135, 84], 
+                    textColor: 255,
+                    halign: 'center' 
+                },
+                columnStyles: {
+                    0: { halign: 'center' },
+                    1: { halign: 'left' },
+                    2: { halign: 'center' },
+                    3: { halign: 'center' },
+                    4: { halign: 'right', fontStyle: 'bold' }
+                },
+                didParseCell: function(data) {
+                    if (data.section === 'body' && data.column.index === 4) {
+                        if (data.cell.raw.toString().includes('-')) {
+                            data.cell.styles.textColor = [220, 53, 69]; // Vermelho
+                        } else {
+                            data.cell.styles.textColor = [25, 135, 84]; // Verde
+                        }
                     }
                 }
+            });
+
+            const finalY = doc.lastAutoTable.finalY || startY;
+            const margemDireita = 283; // 297 - 14 margem
+            
+            // Rodapé
+            doc.setFontSize(12);
+            doc.setTextColor(100, 100, 100); 
+            doc.text(`Entradas: ${UI.formatarMoeda(totalEntradas)}      Saídas: ${UI.formatarMoeda(totalSaidas)}`, margemDireita, finalY + 15, { align: 'right' });
+            
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            const saldoGeral = totalEntradas - totalSaidas;
+            if (saldoGeral >= 0) {
+                doc.setTextColor(25, 135, 84); // Verde
+            } else {
+                doc.setTextColor(220, 53, 69); // Vermelho
             }
-        });
+            doc.text(`Saldo Total: ${UI.formatarMoeda(saldoGeral)}`, margemDireita, finalY + 25, { align: 'right' });
 
-        // 6. Desenha o rodapé com os totais
-        const finalY = doc.lastAutoTable.finalY || 42;
-        doc.setFontSize(11);
-        doc.setTextColor(50, 50, 50);
-        
-        doc.text(`Total de Entradas: ${UI.formatarMoeda(totalEntradas)}`, 14, finalY + 10);
-        doc.text(`Total de Saídas: ${UI.formatarMoeda(totalSaidas)}`, 14, finalY + 16);
-        
-        doc.setFont("helvetica", "bold");
-        if(saldoFinal >= 0) {
-            doc.setTextColor(25, 135, 84);
-        } else {
-            doc.setTextColor(220, 53, 69);
-        }
-        doc.text(`Saldo do Período: ${UI.formatarMoeda(saldoFinal)}`, 14, finalY + 24);
+            doc.save(`Cultiva_Relatorio_${new Date().getTime()}.pdf`);
 
-        // 7. Salva o arquivo e fecha o modal
-        doc.save(`Cultiva_Relatorio_${new Date().getTime()}.pdf`);
-        
-        const modalEl = document.getElementById('modalRelatorio');
-        if(modalEl) {
-            bootstrap.Modal.getInstance(modalEl).hide();
+        } else if (formato === 'png') {
+            let htmlTabela = `<table style="width: 100%; border-collapse: collapse; font-family: sans-serif; font-size: 14px;">
+                <tr style="background-color: #198754; color: white;">
+                    <th style="padding: 10px; text-align: left;">Data</th>
+                    <th style="padding: 10px; text-align: left;">Descrição</th>
+                    <th style="padding: 10px; text-align: center;">Centro de Custo</th>
+                    <th style="padding: 10px; text-align: center;">Pagamento</th>
+                    <th style="padding: 10px; text-align: right;">Valor</th>
+                </tr>`;
+            
+            transacoesFiltradas.forEach((t, i) => {
+                const bg = i % 2 === 0 ? '#f8f9fa' : '#ffffff';
+                const corText = t.tipo === 'entrada' ? '#198754' : '#dc3545';
+                const sinal = t.tipo === 'entrada' ? '' : '- ';
+                htmlTabela += `<tr style="background-color: ${bg}; border-bottom: 1px solid #eee;">
+                    <td style="padding: 10px;">${t.data.split('-').reverse().join('/')}</td>
+                    <td style="padding: 10px;">${t.descricao}</td>
+                    <td style="padding: 10px; text-align: center;">${t.categoriaNome}</td>
+                    <td style="padding: 10px; text-align: center;">${t.pagamento || '-'}</td>
+                    <td style="padding: 10px; text-align: right; color: ${corText}; font-weight: bold;">${sinal}${UI.formatarMoeda(t.valor)}</td>
+                </tr>`;
+            });
+            
+            htmlTabela += `</table>
+            <div style="margin-top: 20px; font-family: sans-serif; text-align: right; font-size: 16px;">
+                <span style="margin-right: 20px; color: #666;">Entradas: <strong>${UI.formatarMoeda(totalEntradas)}</strong></span>
+                <span style="margin-right: 20px; color: #666;">Saídas: <strong>${UI.formatarMoeda(totalSaidas)}</strong></span>
+                <br><br>
+                <strong>Saldo Total: <span style="color: ${totalEntradas - totalSaidas >= 0 ? '#198754' : '#dc3545'}">${UI.formatarMoeda(totalEntradas - totalSaidas)}</span></strong>
+            </div>`;
+
+            document.getElementById('rfTabelaContainer').innerHTML = htmlTabela;
+
+            const elementoFantasma = document.getElementById('relatorioFantasma');
+            elementoFantasma.style.display = 'block'; 
+            
+            // Pausa super importante para o navegador "esticar" a div invisível
+            // e renderizar toda a tabela nova antes de bater a foto
+            await new Promise(r => setTimeout(r, 300)); 
+            
+            // Configuração "Modo Recibo Longo"
+            const canvasImg = await html2canvas(elementoFantasma, { 
+                scale: 2, // Mantém a qualidade alta
+                scrollY: -window.scrollY, // Ignora o scroll da tela do usuário para não cortar o topo
+                windowHeight: elementoFantasma.scrollHeight, // Força ler a altura real da tabela inteira
+                height: elementoFantasma.scrollHeight 
+            }); 
+            
+            elementoFantasma.style.display = 'none'; 
+            
+            const link = document.createElement('a');
+            link.download = `Cultiva_Relatorio_${new Date().getTime()}.png`;
+            link.href = canvasImg.toDataURL('image/png');
+            link.click();
         }
+
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modalRelatorio')).hide();
     },
 }
 
