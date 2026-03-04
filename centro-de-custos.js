@@ -878,7 +878,7 @@ const Controlador = {
         if (incluirGrafico && (totalEntradas > 0 || totalSaidas > 0)) {
             graficosContainer.style.display = 'flex';
 
-            // --- GRÁFICO 1: Barras (Entradas vs Saídas Gerais) ---
+            // --- GRÁFICO 1: Barras ---
             window.graficoBarras = new Chart(canvasBarras, {
                 type: 'bar',
                 data: {
@@ -890,6 +890,8 @@ const Controlador = {
                 },
                 options: { 
                     animation: false,
+                    responsive: true,
+                    maintainAspectRatio: false,
                     plugins: { 
                         title: { display: true, text: 'Entradas vs Saídas', font: { size: 16 } },
                         legend: { display: true } 
@@ -898,7 +900,7 @@ const Controlador = {
                 }
             });
 
-            // --- GRÁFICO 2: Pizza (Despesas por Centro de Custo) ---
+            // --- GRÁFICO 2: Pizza ---
             const labelsDespesas = Object.keys(despesasPorCentro).filter(k => despesasPorCentro[k] > 0);
             const dataDespesas = labelsDespesas.map(k => despesasPorCentro[k]);
             const paletaCores = ['#f6c23e', '#e74a3b', '#4e73df', '#1cc88a', '#36b9cc', '#858796', '#fd7e14', '#6f42c1'];
@@ -913,6 +915,8 @@ const Controlador = {
                     },
                     options: { 
                         animation: false,
+                        responsive: true,
+                        maintainAspectRatio: false, 
                         plugins: { title: { display: true, text: 'Despesas Por Centro de Custo', font: { size: 16 } } }
                     }
                 });
@@ -928,18 +932,14 @@ const Controlador = {
         await new Promise(r => setTimeout(r, 150)); 
 
         // 6. Gera PDF ou PNG
-        // 6. Gera PDF ou PNG
         if (formato === 'pdf') {
             const { jsPDF } = window.jspdf;
-            // PDF paisagem (A4 horizontal: 297mm x 210mm)
             const doc = new jsPDF('landscape'); 
             
-            // Título
             doc.setFontSize(22);
             doc.setTextColor(15, 81, 50);
             doc.text('Relatório de Custos - Cultiva', 14, 20);
             
-            // Subtítulo
             doc.setFontSize(11);
             doc.setTextColor(100, 100, 100);
             doc.text(`${strPeriodo} | ${strColaborador}`, 14, 28);
@@ -947,26 +947,32 @@ const Controlador = {
             let startY = 38;
 
             if (incluirGrafico) {
-                // Tamanho fixo e seguro (120 de largura por 80 de altura)
-                // Isso garante a proporção de 3:2 que usamos no HTML (450x300), 
-                // evitando qualquer achatamento independente do monitor.
-                const larguraGrafico = 120;
-                const alturaGrafico = 80;
-                
-                // Gráfico 1 (Barras)
+                const margem = 14;
+                const espacoMeio = 10;
+                // Calcula a largura ideal para caberem 2 gráficos perfeitos no A4
+                const larguraMaxGrafico = (297 - (margem * 2) - espacoMeio) / 2; 
+
+                // Lendo a proporção do gráfico de barras direto da imagem
                 const imgBarras = canvasBarras.toDataURL('image/png', 1.0);
-                doc.addImage(imgBarras, 'PNG', 14, startY, larguraGrafico, alturaGrafico);
+                const propsBarras = doc.getImageProperties(imgBarras);
+                const alturaPdfBarras = (propsBarras.height * larguraMaxGrafico) / propsBarras.width;
                 
-                // Gráfico 2 (Pizza)
+                doc.addImage(imgBarras, 'PNG', margem, startY, larguraMaxGrafico, alturaPdfBarras);
+                
+                let alturaPdfPizza = 0;
                 const labelsDespesas = Object.keys(despesasPorCentro).filter(k => despesasPorCentro[k] > 0);
+                
                 if (labelsDespesas.length > 0) {
+                    // Proporção do gráfico de pizza
                     const imgPizza = canvasPizza.toDataURL('image/png', 1.0);
-                    // Coloca o segundo gráfico mais pra direita (posição X: 160)
-                    doc.addImage(imgPizza, 'PNG', 160, startY, larguraGrafico, alturaGrafico);
+                    const propsPizza = doc.getImageProperties(imgPizza);
+                    alturaPdfPizza = (propsPizza.height * larguraMaxGrafico) / propsPizza.width;
+                    
+                    doc.addImage(imgPizza, 'PNG', margem + larguraMaxGrafico + espacoMeio, startY, larguraMaxGrafico, alturaPdfPizza);
                 }
                 
-                // Empurra a tabela para começar abaixo dos gráficos
-                startY += alturaGrafico + 15; 
+                const maiorAltura = Math.max(alturaPdfBarras, alturaPdfPizza);
+                startY += maiorAltura + 15; 
             }
 
             // Tabela 
