@@ -375,22 +375,22 @@ function atualizarFaseDaLua() {
     // Ajuste as rotas abaixo para a pasta correta onde seus vetores estão salvos!
     if (fase < 0.05 || fase > 0.95) {
         nome = "Nova";
-        caminhoImagem = "/assets/lua-nova.svg"; 
+        caminhoImagem = "assets/lua-nova.svg"; 
         desc = "Lua Nova - Ideal para plantio de raízes";
         corDesc = "text-secondary"; 
     } else if (fase >= 0.05 && fase < 0.45) {
         nome = "Crescente";
-        caminhoImagem = "/assets/lua-crescente.svg";
+        caminhoImagem = "assets/lua-crescente.svg";
         desc = "Lua Crescente - Bom para plantas que crescem acima do solo.";
         corDesc = "text-secondary";
     } else if (fase >= 0.45 && fase < 0.55) {
         nome = "Cheia";
-        caminhoImagem = "/assets/lua-cheia.svg";
+        caminhoImagem = "assets/lua-cheia.svg";
         desc = "Lua Cheia - Ótima para colheita de frutos e ervas.";
         corDesc = "text-secondary";
     } else {
         nome = "Minguante";
-        caminhoImagem = "/assets/lua-minguante.svg";
+        caminhoImagem = "assets/lua-minguante.svg";
         desc = "Lua Minguante - Excelente para poda e controle de pragas.";
         corDesc = "text-secondary";
     }
