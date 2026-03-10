@@ -41,12 +41,22 @@ btnChart.addEventListener('click', () => {
 
 // 3. Deixando a estrutura pronta para a API do Back-end
 async function buscarMovimentacoesFinanceiras() {
+    // 1. Tenta carregar do cache primeiro (Offline)
+    const dadosSalvos = localStorage.getItem('cultiva_financas_cache');
+    if (dadosSalvos) {
+        const dadosCache = JSON.parse(dadosSalvos);
+        renderizarTabela(dadosCache);
+        renderizarGrafico(dadosCache);
+        atualizarResumo(dadosCache[dadosCache.length - 1]);
+    }
+
     try {
-        // Colocar a URL correta do back-end (ex: http://localhost:3000/api/fluxo)
-        // const resposta = await fetch('URL_API_AQUI');
+        // 2. Tenta buscar os dados do Back-end
+        // const resposta = await fetch('http://localhost:3000/api/fluxo');
+        // if (!resposta.ok) throw new Error('Erro ao buscar dados da API');
         // const dados = await resposta.json();
 
-        // Enquanto o back não é integrado, isso simula a resposta da API
+        // Simulando a resposta da API 
         const dados = [
             { mes: 'Jan', entradas: 3000, saidas: 1800 },
             { mes: 'Fev', entradas: 2500, saidas: 1700 },
@@ -54,30 +64,28 @@ async function buscarMovimentacoesFinanceiras() {
             { mes: 'Abr', entradas: 4250, saidas: 2250 }
         ];
 
-        // Se a API não retornar nada, avisamos o usuário
-        if (!dados || dados.length === 0) {
-            console.warn("Nenhuma movimentação encontrada neste período.");
-            return;
-        }
-
-        // 1. Renderiza a tabela com os dados da API
+        // 3. Atualiza a tela com os dados reais
         renderizarTabela(dados);
-
-        // 2. Renderiza o gráfico com os dados da API
         renderizarGrafico(dados);
-
-        // 3. Inicializa o rodapé pegando sempre o último mês retornado pelo Back-end
         atualizarResumo(dados[dados.length - 1]);
 
+        // 4. Salva no cache para o próximo acesso offline
+        localStorage.setItem('cultiva_financas_cache', JSON.stringify(dados));
+
     } catch (erro) {
-        console.error("Erro ao buscar dados financeiros:", erro);
+        console.warn("Sem conexão com a internet. Exibindo apenas dados em cache.", erro);
+        // Se não houver internet e nem cache, mostra essa mensagem na tela
+        if (!dadosSalvos) {
+            document.getElementById('view-table').innerHTML = '<p class="text-center text-muted mt-3">Conecte-se à internet para carregar seus dados pela primeira vez.</p>';
+            // E esconde os gráficos
+        }
     }
 }
 
 // Executa a busca assim que a tela carregar
 buscarMovimentacoesFinanceiras();
 
-// 4. Função para popular a tabela dinamicamente
+// 4. Função para preencher a tabela dinamicamente
 function renderizarTabela(dados) {
     // Limpa a tabela antes de preencher
     tableBody.innerHTML = ''; 
@@ -101,7 +109,13 @@ function renderizarTabela(dados) {
 
 // 5. Configuração do Gráfico com Chart.js
 function renderizarGrafico(dados) {
-    const ctx = document.getElementById('financeChart').getContext('2d');
+   const canvas = document.getElementById('financeChart');
+    const ctx = canvas.getContext('2d');
+
+    let chartExistente = Chart.getChart(canvas);
+    if (chartExistente) {
+        chartExistente.destroy();
+    }
 
     // Extrai apenas os meses para o eixo X
     const labels = dados.map(item => item.mes);
@@ -138,7 +152,7 @@ function renderizarGrafico(dados) {
                     atualizarResumo(dados[indiceClicado]);
                     
                     // Muda a cor das barras dinamicamente 
-                    // A barra clicada fica verde (#198754) e as outras ficam cinza (#dee2e6)
+                    // A barra clicada fica verde e as outras ficam cinza
                     chart.data.datasets[0].backgroundColor = chart.data.labels.map((_, i) => {
                         return i === indiceClicado ? '#198754' : '#dee2e6';
                     });
