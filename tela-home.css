@@ -1,0 +1,24 @@
+body {
+    padding-bottom: 80px !important; 
+}
+
+.hero-section {
+    height: 180px;
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0, 0, 0, 0) 100%),
+                url('img/img-capa.jpg') center/cover no-repeat;
+}
+
+.btn-white.active {
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+}
+
+.btn-circle {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
