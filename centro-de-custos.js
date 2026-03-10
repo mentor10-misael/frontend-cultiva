@@ -848,7 +848,6 @@ const Controlador = {
         const despesasPorCentro = {};
 
         transacoesFiltradas.forEach(t => {
-            // Inicia zerado se não existir no objeto
             if (!lucrosPorCentro[t.categoriaNome]) lucrosPorCentro[t.categoriaNome] = 0;
             if (!despesasPorCentro[t.categoriaNome]) despesasPorCentro[t.categoriaNome] = 0;
 
@@ -878,6 +877,12 @@ const Controlador = {
         if (incluirGrafico && (totalEntradas > 0 || totalSaidas > 0)) {
             graficosContainer.style.display = 'flex';
 
+            // CORREÇÃO: Forçar dimensões explicitamente pro Chart.js não se perder na div invisível
+            canvasBarras.width = 450;
+            canvasBarras.height = 300;
+            canvasPizza.width = 450;
+            canvasPizza.height = 300;
+
             // --- GRÁFICO 1: Barras ---
             window.graficoBarras = new Chart(canvasBarras, {
                 type: 'bar',
@@ -890,7 +895,7 @@ const Controlador = {
                 },
                 options: { 
                     animation: false,
-                    responsive: true,
+                    responsive: false, // CORREÇÃO: Remove a dependência do CSS/DOM
                     maintainAspectRatio: false,
                     plugins: { 
                         title: { display: true, text: 'Entradas vs Saídas', font: { size: 16 } },
@@ -915,7 +920,7 @@ const Controlador = {
                     },
                     options: { 
                         animation: false,
-                        responsive: true,
+                        responsive: false, // CORREÇÃO: Remove a dependência do CSS/DOM
                         maintainAspectRatio: false, 
                         plugins: { title: { display: true, text: 'Despesas Por Centro de Custo', font: { size: 16 } } }
                     }
@@ -949,13 +954,12 @@ const Controlador = {
             if (incluirGrafico) {
                 const margem = 14;
                 const espacoMeio = 10;
-                // Calcula a largura ideal para caberem 2 gráficos perfeitos no A4
                 const larguraMaxGrafico = (297 - (margem * 2) - espacoMeio) / 2; 
 
-                // Lendo a proporção do gráfico de barras direto da imagem
                 const imgBarras = canvasBarras.toDataURL('image/png', 1.0);
-                const propsBarras = doc.getImageProperties(imgBarras);
-                const alturaPdfBarras = (propsBarras.height * larguraMaxGrafico) / propsBarras.width;
+                
+                // CORREÇÃO: Lendo propriedades direto do canvas em vez do doc.getImageProperties()
+                const alturaPdfBarras = (canvasBarras.height * larguraMaxGrafico) / canvasBarras.width;
                 
                 doc.addImage(imgBarras, 'PNG', margem, startY, larguraMaxGrafico, alturaPdfBarras);
                 
@@ -963,10 +967,8 @@ const Controlador = {
                 const labelsDespesas = Object.keys(despesasPorCentro).filter(k => despesasPorCentro[k] > 0);
                 
                 if (labelsDespesas.length > 0) {
-                    // Proporção do gráfico de pizza
                     const imgPizza = canvasPizza.toDataURL('image/png', 1.0);
-                    const propsPizza = doc.getImageProperties(imgPizza);
-                    alturaPdfPizza = (propsPizza.height * larguraMaxGrafico) / propsPizza.width;
+                    alturaPdfPizza = (canvasPizza.height * larguraMaxGrafico) / canvasPizza.width;
                     
                     doc.addImage(imgPizza, 'PNG', margem + larguraMaxGrafico + espacoMeio, startY, larguraMaxGrafico, alturaPdfPizza);
                 }
@@ -1013,7 +1015,7 @@ const Controlador = {
             });
 
             const finalY = doc.lastAutoTable.finalY || startY;
-            const margemDireita = 283; // 297 - 14 margem
+            const margemDireita = 283; 
             
             // Rodapé
             doc.setFontSize(12);
@@ -1068,15 +1070,12 @@ const Controlador = {
             const elementoFantasma = document.getElementById('relatorioFantasma');
             elementoFantasma.style.display = 'block'; 
             
-            // Pausa super importante para o navegador "esticar" a div invisível
-            // e renderizar toda a tabela nova antes de bater a foto
             await new Promise(r => setTimeout(r, 300)); 
             
-            // Configuração "Modo Recibo Longo"
             const canvasImg = await html2canvas(elementoFantasma, { 
-                scale: 2, // Mantém a qualidade alta
-                scrollY: -window.scrollY, // Ignora o scroll da tela do usuário para não cortar o topo
-                windowHeight: elementoFantasma.scrollHeight, // Força ler a altura real da tabela inteira
+                scale: 2, 
+                scrollY: -window.scrollY, 
+                windowHeight: elementoFantasma.scrollHeight, 
                 height: elementoFantasma.scrollHeight 
             }); 
             
