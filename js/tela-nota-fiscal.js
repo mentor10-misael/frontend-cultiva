@@ -138,4 +138,53 @@ deleteModal.addEventListener("show.bs.modal", function (event) {
   // Salva o número num atributo do botão de confirmar para uso posterior
   const confirmBtn = deleteModal.querySelector("#btn-confirm-delete");
   confirmBtn.setAttribute("data-current-invoice", invoiceNumber);
+
+  // Confirmação da deleção da nota fiscal
 });
+
+// Função que remove a nota do localStorage e renderiza a pagina novamente
+function deleteInvoice(invoiceNumber) {
+  let storedInvoices =
+    JSON.parse(localStorage.getItem("notas_armazenadas")) || [];
+
+  const updatedInvoices = storedInvoices.filter(
+    (invoice) => invoice.invoiceNumber !== invoiceNumber,
+  );
+
+  localStorage.setItem("notas_armazenadas", JSON.stringify(updatedInvoices));
+
+  renderInvoices();
+}
+
+// Listener no formulário de confirmação de exclusão
+document
+  .getElementById("delete-invoice-form")
+  .addEventListener("submit", function (ev) {
+    ev.preventDefault();
+
+    const confirmBtn = deleteModal.querySelector("#btn-confirm-delete");
+    const invoiceToDelete = confirmBtn.getAttribute("data-current-invoice");
+    const inputValue = deleteModal
+      .querySelector("#confirm-invoice-input")
+      .value.trim();
+
+    if (inputValue !== invoiceToDelete) {
+      // Feedback visual de erro no input
+      const input = deleteModal.querySelector("#confirm-invoice-input");
+      input.classList.add("is-invalid");
+
+      // Remove a classe de erro ao começar a digitar novamente
+      input.addEventListener(
+        "input",
+        () => input.classList.remove("is-invalid"),
+        { once: true },
+      );
+      return;
+    }
+
+    deleteInvoice(invoiceToDelete);
+
+    // Fecha o modal após a remoção bem-sucedida
+    const modalInstance = bootstrap.Modal.getInstance(deleteModal);
+    modalInstance.hide();
+  });
