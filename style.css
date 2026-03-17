@@ -125,9 +125,9 @@ body {
 /* Botão (Gerar PDF) */
 
 .btn-check:checked + .btn-outline-secondary {
-  background-color: #f8f9fa; 
-  color: #198754; 
-  border-color: #198754; 
+  background-color: #f8f9fa;
+  color: #198754;
+  border-color: #198754;
   font-weight: 600;
 }
 
@@ -140,12 +140,12 @@ body {
 
 .form-control:focus {
   box-shadow: none;
-  border-color: #198754; 
+  border-color: #198754;
 }
 
 /* Botão Escuro (Gerar PDF) */
 .btn-dark {
-  background-color: #0f172a; 
+  background-color: #0f172a;
   border: none;
 }
 
@@ -167,20 +167,19 @@ body {
 .card-select {
   border: 1px solid #dee2e6;
   background-color: #fff;
-  color: #6c757d; 
+  color: #6c757d;
   transition: all 0.2s ease;
 }
 
 .btn-check:checked + .card-select {
-  border-color: #198754; 
-  background-color: #f0fdf4; 
-  color: #198754; 
+  border-color: #198754;
+  background-color: #f0fdf4;
+  color: #198754;
 }
-
 
 .form-control,
 .form-select {
-  border-radius: 8px; 
+  border-radius: 8px;
   border-color: #e2e8f0;
   padding: 10px 12px;
 }
@@ -198,13 +197,13 @@ body {
 
 #tipoMaquinas:checked + .card-select {
   border-color: #0d6efd;
-  background-color: #ecf4ff; 
+  background-color: #ecf4ff;
   color: #0d6efd;
 }
 
 #tipoGeral:checked + .card-select {
-  border-color: #a855f7; 
-  background-color: #faf5ff; 
+  border-color: #a855f7;
+  background-color: #faf5ff;
   color: #a855f7;
 }
 
@@ -214,6 +213,131 @@ body {
   border: 1px solid #e9d5ff;
 }
 
+.text-purple {
+  color: #a855f7;
+}
+
+/* Modal de Movimentação*/
+
+/* Botões das Abas (Entrada/Saída) */
+.btn-tab-movimentacao {
+  border: 1px solid #e9ecef;
+  background-color: #fff;
+  color: #6c757d;
+  border-radius: 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Aba Entrada Ativa */
+.btn-tab-entrada.active {
+  background-color: #e7f7ed; 
+  color: var(--cultiva-green); 
+  border-color: var(--cultiva-green);
+}
+
+/* Aba Saída Ativa */
+.btn-tab-saida.active {
+  background-color: #fbeaea;
+  color: var(--cultiva-red); 
+  border-color: var(--cultiva-red);
+}
+
+/* Área de Upload */
+.upload-area {
+  border: 2px dashed #dee2e6;
+  border-radius: 1rem;
+  background-color: #f8f9fa;
+  transition: border-color 0.2s;
+}
+
+.upload-area:hover {
+  border-color: #adb5bd;
+}
+
+/* Inputs do modal */
+#modalNovaMovimentacao .form-control,
+#modalNovaMovimentacao .form-select,
+#modalNovaMovimentacao .input-group-text {
+  border-color: #dee2e6;
+  border-radius: 0.75rem;
+}
+#modalNovaMovimentacao .input-group .form-control,
+#modalNovaMovimentacao .input-group .form-select {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+#modalNovaMovimentacao .input-group .input-group-text {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* Ícones redondos na lista de detalhes */
+.icon-circle-detail {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+/* Botão Editar*/
+.btn-light-blue {
+    background-color: #eff6ff;
+    border: none;
+    transition: 0.2s;
+}
+.btn-light-blue:hover {
+    background-color: #dbeafe;
+}
+
+/* Botão Excluir */
+.btn-light-red {
+    background-color: #fef2f2;
+    border: none;
+    transition: 0.2s;
+}
+.btn-light-red:hover {
+    background-color: #fee2e2;
+}
+
+/* Largura dos botões */
+.w-45 {
+    width: 48%;
+}
+
+.transition-all {
+  transition: all 0.3s ease;
+}
+
+/* Cores específicas para os botões */
+.btn-lavoura {
+  background-color: #198754; /* Verde */
+  border-color: #198754;
+  color: white;
+}
+.btn-lavoura:hover { background-color: #157347; color: white; }
+
+.btn-maquinas {
+  background-color: #0d6efd; /* Azul */
+  border-color: #0d6efd;
+  color: white;
+}
+.btn-maquinas:hover { background-color: #0b5ed7; color: white; }
+
+.btn-geral {
+  background-color: #a855f7; /* Roxo */
+  border-color: #a855f7;
+  color: white;
+}
+.btn-geral:hover { background-color: #9333ea; color: white; }
+
+/* Estilização do Alerta Roxo (Geral) */
+.alert-purple {
+  background-color: #faf5ff;
+  border: 1px solid #e9d5ff;
+}
 .text-purple {
   color: #a855f7;
 }
