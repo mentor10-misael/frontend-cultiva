@@ -1,6 +1,16 @@
 <!doctype html>
 <html lang="pt-br">
   <head>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Frontend Cultiva - Bootcamp</title>
@@ -11,21 +21,29 @@
     />
   </head>
   <body class="bg-light">
-    <div class="container py-5">
-      <div class="card shadow-sm">
-        <div class="card-body text-center">
-          <h1 class="card-title mb-4">Bem-vindo ao Cultiva</h1>
-          <p class="card-text text-muted">
-            A aplicação frontend está configurada com Bootstrap e Axios.
-          </p>
-          <div id="status" class="alert alert-info">
-            Status da API: <span id="api-message">Carregando...</span>
+    <div class="container mt-5 d-flex justify-content-center">
+      <div class="card shadow-sm p-4">
+        <h3 class="mb-4">Relatório de Custos</h3>
+
+        <div class="row mb-3">
+          <div class="col">
+            <label class="form-label">Data Início</label>
+            <input type="date" id="dataInicio" class="form-control" />
+          </div>
+
+          <div class="col">
+            <label class="form-label">Data Fim</label>
+            <input type="date" id="dataFim" class="form-control" />
           </div>
           <p class="text-muted small">
             A requisição é feita automaticamente ao abrir a página, para
             garantir que a api está respondendo.
           </p>
         </div>
+
+        <button id="btnRelatorio" class="btn btn-dark w-100">
+          Gerar Relatório
+        </button>
       </div>
     </div>
 

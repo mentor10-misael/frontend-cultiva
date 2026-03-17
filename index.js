@@ -1,22 +1,15 @@
-// Configuração básica do Axios
-const api = axios.create({
-    baseURL: 'http://localhost:3000'
-});
+const btnRelatorio = document.getElementById("btnRelatorio");
 
-document.addEventListener('DOMContentLoaded', async () => {
-    const statusDiv = document.getElementById('status');
-    const apiMessage = document.getElementById('api-message');
+btnRelatorio.addEventListener("click", () => {
+  const inicio = document.getElementById("dataInicio").value;
+  const fim = document.getElementById("dataFim").value;
 
-    statusDiv.classList.remove('d-none');
-    apiMessage.textContent = 'Verificando conexão com a API...';
+  if (!inicio || !fim) {
+    alert("Por favor, selecione ambas as datas!");
+    return;
+  }
 
-    try {
-        const response = await api.get('/');
-        apiMessage.textContent = response.data.message;
-        statusDiv.classList.replace('alert-info', 'alert-success');
-    } catch (error) {
-        apiMessage.textContent = 'Erro ao conectar com o backend.';
-        statusDiv.classList.replace('alert-info', 'alert-danger');
-        console.error('Erro detalhado:', error);
-    }
+  console.log("Chamando API com filtros:", { inicio, fim });
+
+  alert("A API ainda não está implementada. Quando estiver, aqui vai baixar o arquivo.");
 });
