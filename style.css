@@ -1,0 +1,219 @@
+body {
+  background-color: #f8f9fa;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.header-custom {
+  padding-top: 10px;
+  padding-bottom: 20px;
+  cursor: pointer;
+}
+
+.fa-user {
+  font-weight: 600;
+}
+
+.btn-circle {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Cards de Receita/Despesa */
+.card-summary {
+  border: 0;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.card-summary-revenue {
+  background-color: #e8f5e9;
+}
+
+.card-summary-expense {
+  background-color: #ffebee;
+}
+
+.icon-circle-sm {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fs-xs {
+  font-size: 12px;
+}
+.fs-xxs {
+  font-size: 11px;
+}
+
+/*Carrossel de Centros de Custo*/
+.horizontal-scroll-container {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.horizontal-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Card Novo */
+.card-add-new {
+  width: 100px;
+  height: 110px;
+  border: 2px dashed #ccc;
+  cursor: pointer;
+  background-color: #f8f9fa;
+}
+
+/* Cards de Itens (Milho, Máquinas) */
+.card-cost-center {
+  width: 110px;
+  height: 110px;
+  border: 0;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.card-cost-center.active {
+  border: 1px solid #198754;
+}
+
+.fs-card-title {
+  font-size: 13px;
+}
+
+/*Histórico e Transações*/
+.search-input {
+  font-size: 14px;
+}
+
+.card-transaction {
+  border: 0;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.border-start-success-thick {
+  border-left: 5px solid #198754;
+}
+
+.border-start-danger-thick {
+  border-left: 5px solid #dc3545;
+}
+
+.badge-admin {
+  background-color: #e0cffc;
+  color: #6f42c1;
+  font-size: 10px;
+}
+
+.badge-user {
+  font-size: 10px;
+}
+
+.text-date {
+  font-size: 11px;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* Botão (Gerar PDF) */
+
+.btn-check:checked + .btn-outline-secondary {
+  background-color: #f8f9fa; 
+  color: #198754; 
+  border-color: #198754; 
+  font-weight: 600;
+}
+
+.form-control,
+.input-group-text {
+  border-color: #dee2e6;
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+}
+
+.form-control:focus {
+  box-shadow: none;
+  border-color: #198754; 
+}
+
+/* Botão Escuro (Gerar PDF) */
+.btn-dark {
+  background-color: #0f172a; 
+  border: none;
+}
+
+/* Navbar Inferior */
+.bottom-nav-link {
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bottom-nav-label {
+  font-size: 10px;
+  margin-top: 2px;
+}
+
+/* Modal Novo Centro de Custo */
+
+.card-select {
+  border: 1px solid #dee2e6;
+  background-color: #fff;
+  color: #6c757d; 
+  transition: all 0.2s ease;
+}
+
+.btn-check:checked + .card-select {
+  border-color: #198754; 
+  background-color: #f0fdf4; 
+  color: #198754; 
+}
+
+
+.form-control,
+.form-select {
+  border-radius: 8px; 
+  border-color: #e2e8f0;
+  padding: 10px 12px;
+}
+
+.form-control::placeholder {
+  color: #adb5bd;
+  font-size: 13px;
+}
+
+#tipoLavoura:checked + .card-select {
+  border-color: #198754;
+  background-color: #f0fdf4;
+  color: #198754;
+}
+
+#tipoMaquinas:checked + .card-select {
+  border-color: #0d6efd;
+  background-color: #ecf4ff; 
+  color: #0d6efd;
+}
+
+#tipoGeral:checked + .card-select {
+  border-color: #a855f7; 
+  background-color: #faf5ff; 
+  color: #a855f7;
+}
+
+/* Caixa de Alerta Roxa */
+.alert-purple {
+  background-color: #faf5ff;
+  border: 1px solid #e9d5ff;
+}
+
+.text-purple {
+  color: #a855f7;
+}
