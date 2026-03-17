@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    />
+    <link rel="stylesheet" href="../css/tela-nota-fiscal.css" />
+    <title>Tela de notas fiscais</title>
+  </head>
+  <body>
+    <header>
+      <div class="container-fluid">
+        <nav class="navbar navbar-expand-sm d-flex justify-content-between">
+          <div>
+            <p>
+              Olá,<br /><span class="fw-bold" style="color: #1a2b40"
+                >Administrador</span
+              >
+            </p>
+          </div>
+          <div class="p-2 d-flex align-items-center">
+            <i
+              class="d-flex align-items-center justify-content-center rounded-circle bi bi-person-circle p-1 m-1 fs-4 text-success"
+              style="
+                border: 1px solid none;
+                background-color: lightgreen;
+                width: 40px;
+                height: 40px;
+              "
+            >
+            </i>
+            <i
+              class="bi bi-chevron-down m-1 fs-6 dropdown-toggle"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            ></i>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Sair</a></li>
+              <li><a class="dropdown-item" href="#">Mudar de usuário</a></li>
+            </ul>
+          </div>
+        </nav>
+        <hr />
+      </div>
+    </header>
+    <main>
+      <section id="notas-fiscais">
+        <div class="container-fluid">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold m-0 header-title" style="letter-spacing: -0.5px">
+              Notas Fiscais
+            </h2>
+
+            <div class="d-flex gap-2">
+              <button
+                id="button-reports"
+                class="btn btn-white border shadow-sm rounded-circle d-flex align-items-center justify-content-center"
+                style="
+                  width: 40px;
+                  height: 40px;
+                  background-color: #fff;
+                  border: none;
+                "
+              >
+                <i class="bi bi-file-earmark-bar-graph text-secondary"></i>
+              </button>
+              <button
+                id="button-add-invoice"
+                type="button"
+                class="btn btn-success shadow-sm rounded-circle d-flex align-items-center justify-content-center"
+                style="
+                  width: 40px;
+                  height: 40px;
+                  background-color: #00a859;
+                  border: none;
+                "
+                data-bs-toggle="modal"
+                data-bs-target="#invoice-modal"
+              >
+                <i class="bi bi-plus-lg fs-5"></i>
+              </button>
+            </div>
+            <!--MODAL DO REGISTRO DE NOTAS-->
+            <div class="modal" tabindex="-1" id="invoice-modal">
+              <div class="modal-dialog modal-fullscreen-sm-down">
+                <div class="modal-content">
+                  <div
+                    class="modal-header d-flex flex-column justify-content-start"
+                  >
+                    <button
+                      type="button"
+                      class="btn-close"
+                      data-bs-dismiss="modal"
+                      aria-label="Close"
+                    ></button>
+                    <div>
+                      <h5 class="modal-title">Nova Nota Fiscal</h5>
+                      <p style="font-size: 14px; letter-spacing: 0.5px">
+                        Registre uma nova nota fiscal de entrada ou saída
+                      </p>
+                    </div>
+                  </div>
+                  <div class="modal-body">
+                    <form id="register-form">
+                      <label class="form-label">Tipo de Nota</label>
+                      <div class="row g-2 type-selector mb-3">
+                        <div class="col-6">
+                          <input
+                            type="radio"
+                            class="btn-check"
+                            name="invoiceType"
+                            id="invoiceTypeOut"
+                          />
+                          <label
+                            for="invoiceTypeOut"
+                            class="btn btn-outline-success d-flex flex-column"
+                          >
+                            <span
+                              class="d-flex align-items-center gap-2 fw-bold"
+                            >
+                              <i class="bi bi-arrow-up-right text-success"></i>
+                              Saída (Venda)
+                            </span>
+                          </label>
+                        </div>
+                        <div class="col-6">
+                          <input
+                            type="radio"
+                            class="btn-check"
+                            name="invoiceType"
+                            id="invoiceTypeIn"
+                          />
+                          <label
+                            for="invoiceTypeIn"
+                            class="btn btn-outline-secondary d-flex flex-column"
+                          >
+                            <span
+                              class="d-flex align-items-center gap-2 fw-bold"
+                            >
+                              <i class="bi bi-arrow-down-left text-danger"></i>
+                              Entrada<br />(Despesa)
+                            </span>
+                          </label>
+                        </div>
+                      </div>
+
+                      <div class="row g-2 mb-3">
+                        <div class="col-6">
+                          <label for="invoiceNumber" class="form-label"
+                            >Número da Nota</label
+                          >
+                          <input
+                            type="text"
+                            class="form-control"
+                            placeholder="Ex: 12345"
+                            name="invoiceNumber"
+                            id="invoiceNumber"
+                          />
+                        </div>
+                        <div class="col-6">
+                          <label for="invoiceIssueDate" class="form-label"
+                            >Data de Emissão</label
+                          >
+                          <div class="position-relative">
+                            <input
+                              id="invoiceIssueDate"
+                              name="invoiceIssueDate"
+                              type="date"
+                              class="form-control"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="invoiceValue" class="form-label"
+                          >Valor (R$)</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          placeholder="0,00"
+                          id="invoiceValue"
+                          name="invoiceValue"
+                        />
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="description" class="form-label"
+                          >Descrição</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          placeholder="Ex: Venda de Soja"
+                          id="description"
+                          name="description"
+                        />
+                      </div>
+
+                      <!--Verificar se é possível colocar esse centro de custo como um select e verificar a questão da integração dessa parte com o backend-->
+                      <div class="mb-3">
+                        <label for="costCenter" class="form-label"
+                          >Centro de Custo</label
+                        >
+                        <select
+                          class="form-select"
+                          name="costCenter"
+                          id="costCenter"
+                        >
+                          <option value="Agricultura">Agricultura</option>
+                          <option value="Agropecuária">Agropecuária</option>
+                          <option value="Pecuária">Pecuária</option>
+                          <option value="Agroindústria">Agroindústria</option>
+                        </select>
+                      </div>
+
+                      <div class="mb-4">
+                        <label for="fileUpload" class="form-label text-muted"
+                          >Arquivo da Nota
+                          <span class="fw-normal">(Opcional)</span></label
+                        >
+                        <div class="upload-area">
+                          <i class="bi bi-upload fs-2 d-block mb-2"></i>
+                          <span class="d-block fw-medium"
+                            >Envio de fotos ou PDF</span
+                          >
+                          <small class="text-muted" style="font-size: 11px"
+                            >Máx. 5MB</small
+                          >
+                        </div>
+                        <input
+                          type="file"
+                          id="fileUpload"
+                          class="mt-3 text-center form-control"
+                        />
+                      </div>
+
+                      <button
+                        id="registerInvoice"
+                        type="submit"
+                        class="btn btn-register"
+                      >
+                        Registrar Nota
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!--MODAL DO REGISTRO DE NOTAS-->
+          </div>
+          <div class="row g-3">
+            <!-- Card PENDENTES -->
+            <div class="col-12">
+              <div
+                class="card border-2 rounded-4 bg-warning-subtle"
+                style="border-color: #fce7a2 !important"
+              >
+                <div class="card-body p-4">
+                  <div class="d-flex align-items-center mb-1">
+                    <i
+                      class="bi bi-exclamation-circle text-warning me-2 fs-6"
+                    ></i>
+                    <small
+                      class="fw-bold text-warning-emphasis"
+                      style="letter-spacing: 0.5px"
+                      >PENDENTES</small
+                    >
+                  </div>
+                  <!-- ADICIONE id="count-pending" aqui -->
+                  <div
+                    id="count-pending"
+                    class="display-number fw-bold mb-0"
+                    style="color: #856404; font-size: 3.5rem; line-height: 1.1"
+                  >
+                    0
+                  </div>
+                  <p class="text-warning-emphasis mb-0 opacity-75">
+                    Aguardando Contra Nota
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card REGULARIZADAS -->
+            <div class="col-12">
+              <div
+                class="card border-2 rounded-4 bg-success-subtle"
+                style="border-color: #d1e7dd !important"
+              >
+                <div class="card-body p-4">
+                  <div class="d-flex align-items-center mb-1">
+                    <i class="bi bi-check-circle text-success me-2 fs-6"></i>
+                    <small
+                      class="fw-bold text-success-emphasis"
+                      style="letter-spacing: 0.5px"
+                      >REGULARIZADAS</small
+                    >
+                  </div>
+                  <!-- ADICIONE id="count-regularized" aqui -->
+                  <div
+                    id="count-regularized"
+                    class="display-number fw-bold mb-0"
+                    style="color: #0f5132; font-size: 3.5rem; line-height: 1.1"
+                  >
+                    0
+                  </div>
+                  <p class="text-success-emphasis mb-0 opacity-75">
+                    Processo concluído
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="todas-as-notas">
+        <div
+          style="
+            max-width: 500px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+          "
+          class="container-fluid"
+        >
+          <div class="d-flex align-items-center gap-2 mt-3">
+            <i class="bi bi-file-earmark-text fs-4 text-secondary"></i>
+            <h4 class="fw-bold m-0 header-title">Todas as notas</h4>
+          </div>
+          <!--Área do titulo e do filtro de notas fiscais-->
+          <!--
+  SUBSTITUA o bloco abaixo no seu HTML:
+  (o div com class "d-flex gap-2 mb-4" que contém o input de busca e o botão de filtro)
+-->
+
+          <div class="d-flex gap-2 mb-4 align-items-center">
+            <!-- Input de busca por número da nota -->
+            <div
+              class="input-group input-group-sm border rounded-pill px-2 flex-grow-1 search-bar"
+            >
+              <span class="input-group-text bg-transparent border-0">
+                <i
+                  class="bi bi-search text-muted"
+                  style="font-size: 0.85rem"
+                ></i>
+              </span>
+              <input
+                type="text"
+                id="search-invoice-input"
+                class="form-control border-0 shadow-none"
+                placeholder="Buscar pelo N° da nota..."
+              />
+              <!-- Botão X para limpar a busca (oculto por padrão) -->
+              <button
+                id="btn-clear-search"
+                class="btn btn-sm bg-transparent border-0 d-none px-2"
+                type="button"
+                title="Limpar busca"
+              >
+                <i class="bi bi-x text-muted fs-5"></i>
+              </button>
+            </div>
+
+            <!-- Dropdown de filtro por status -->
+            <div class="dropdown position-relative">
+              <button
+                class="btn btn-sm text-secondary border-0 filter-btn position-relative"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                title="Filtrar notas"
+              >
+                <i class="bi bi-funnel fs-4"></i>
+                <!-- Badge vermelho que aparece quando um filtro está ativo -->
+                <span
+                  id="filter-active-badge"
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none"
+                  style="font-size: 0.5rem; padding: 3px 5px"
+                >
+                  &bull;
+                </span>
+              </button>
+
+              <ul
+                class="dropdown-menu dropdown-menu-end shadow-sm border-0"
+                style="min-width: 180px; border-radius: 12px"
+              >
+                <li>
+                  <span
+                    class="dropdown-header text-muted"
+                    style="font-size: 0.75rem; letter-spacing: 0.5px"
+                  >
+                    FILTRAR POR STATUS
+                  </span>
+                </li>
+                <li><hr class="dropdown-divider my-1" /></li>
+                <li>
+                  <a
+                    class="dropdown-item filter-option active d-flex align-items-center gap-2"
+                    href="#"
+                    data-filter="all"
+                  >
+                    <i class="bi bi-list-ul text-secondary"></i>
+                    <span id="filter-label">Todas as notas</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item filter-option d-flex align-items-center gap-2"
+                    href="#"
+                    data-filter="pending"
+                  >
+                    <i class="bi bi-clock text-warning"></i>
+                    Pendentes
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item filter-option d-flex align-items-center gap-2"
+                    href="#"
+                    data-filter="regularized"
+                  >
+                    <i class="bi bi-check-circle text-success"></i>
+                    Regularizadas
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <!--Área do titulo e do filtro de notas fiscais-->
+          <div id="invoice-list">
+            <!--As notas serão renderizadas aqui-->
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <div
+        class="container-fluid mt-3 p-3 d-flex justify-content-evenly border"
+      >
+        <div class="d-flex flex-column align-items-center">
+          <i class="bi bi-house-fill footer-icon-hover"></i>
+          <p style="font-size: 14px; letter-spacing: 1px">Inicio</p>
+        </div>
+        <div class="d-flex flex-column align-items-center">
+          <i class="bi bi-wallet-fill footer-icon-hover"></i>
+          <p style="font-size: 14px; letter-spacing: 1px">Custos</p>
+        </div>
+        <div class="d-flex flex-column align-items-center">
+          <i class="bi bi-file-earmark-fill footer-icon-hover"></i>
+          <p style="font-size: 14px; letter-spacing: 1px">Notas</p>
+        </div>
+        <div class="d-flex flex-column align-items-center">
+          <i class="bi bi-calendar-event-fill footer-icon-hover"></i>
+          <p style="font-size: 14px; letter-spacing: 1px">Calendario</p>
+        </div>
+      </div>
+    </footer>
+    <div
+      class="modal fade"
+      id="deleteInvoiceModal"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5">Remoção de Nota Fiscal</h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p>
+              Você está prestes a remover a nota:
+              <strong id="modal-invoice-display"></strong>
+            </p>
+            <form id="delete-invoice-form">
+              <label for="confirm-invoice-input" class="form-label"
+                >Confirme o número da nota:</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="confirm-invoice-input"
+              />
+
+              <div class="modal-footer d-flex flex-row-reverse pb-0 mt-3">
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  data-bs-dismiss="modal"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-success"
+                  id="btn-confirm-delete"
+                >
+                  Confirmar Remoção
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous"
+    ></script>
+    <script src="../js/tela-nota-fiscal.js"></script>
+  </body>
+</html>

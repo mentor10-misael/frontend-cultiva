@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cultiva - Centro de Custos</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <script defer src="centro-de-custos.js"></script>
+  </head>
+
+  <body>
+    <div class="bg-white border-bottom pt-3 pb-3 sticky-top">
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="d-flex flex-column justify-content-center">
+            <span
+              class="text-muted"
+              style="font-size: 12px; margin-bottom: -4px"
+              >Olá,</span
+            >
+            <h6 class="fw-bold text-dark m-0">Administrador</h6>
+          </div>
+
+          <div class="dropdown">
+            <div
+              class="d-flex align-items-center gap-2 cursor-pointer"
+              id="userDropdown"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <div
+                class="rounded-circle d-flex align-items-center justify-content-center border"
+                style="
+                  width: 42px;
+                  height: 42px;
+                "
+              >
+                <i class="fa-regular fa-user fs-5"></i>
+              </div>
+
+              <i
+                class="fa-solid fa-chevron-down text-muted"
+                style="font-size: 12px"
+              ></i>
+            </div>
+
+            <ul
+              class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 p-2 mt-2"
+              aria-labelledby="userDropdown"
+              style="min-width: 260px"
+            >
+              <li class="px-3 py-3">
+                <h6 class="fw-bold m-0 text-dark">Administrador</h6>
+                <div class="text-muted small">admin@cultiva.com</div>
+              </li>
+
+              <li><hr class="dropdown-divider my-1" /></li>
+
+              <li>
+                <a
+                  class="dropdown-item py-2 d-flex align-items-center gap-3 text-secondary"
+                  href="#"
+                >
+                  <i class="fa-regular fa-circle-user fs-6"></i>
+                  <span>Meu Perfil</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item py-2 d-flex align-items-center gap-3 text-secondary"
+                  href="#"
+                >
+                  <i class="fa-solid fa-users fs-6"></i>
+                  <span>Gerenciar Equipe</span>
+                </a>
+              </li>
+
+              <li><hr class="dropdown-divider my-1" /></li>
+
+              <li>
+                <a
+                  class="dropdown-item py-2 d-flex align-items-center gap-3 text-danger fw-semibold"
+                  href="#"
+                >
+                  <i class="fa-solid fa-arrow-right-from-bracket fs-6"></i>
+                  <span>Sair do Sistema</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container pb-5">
+      <div
+        class="d-flex justify-content-between align-items-center header-custom mt-2 mb-3"
+      >
+        <h3 class="fw-bold m-0 text-dark">Controle de Custos</h3>
+
+        <div class="d-flex gap-2">
+          <button
+            class="btn btn-outline-secondary btn-circle bg-white"
+            data-bs-toggle="modal"
+            data-bs-target="#modalRelatorio"
+          >
+            <i class="fa-regular fa-file-pdf"></i>
+          </button>
+          <button
+            class="btn btn-success btn-circle"
+            data-bs-toggle="modal"
+            data-bs-target="#modalNovaMovimentacao"
+            id="btnNovaTransacao"
+          >
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="row mb-4">
+        <div class="col-6">
+          <div class="card card-summary card-summary-revenue h-100">
+            <div
+              class="card-body p-3 d-flex flex-column justify-content-center"
+            >
+              <div class="d-flex align-items-center mb-2">
+                <div
+                  class="rounded-circle bg-success text-white icon-circle-sm me-2"
+                >
+                  <i class="fa-solid fa-arrow-up fs-xs"></i>
+                </div>
+                <small class="text-success fw-semibold fs-xxs"
+                  >Receitas Totais</small
+                >
+              </div>
+              <h5 class="fw-bold text-dark m-0" id="totalReceitas">R$ 0,00</h5>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-6">
+          <div class="card card-summary card-summary-expense h-100">
+            <div
+              class="card-body p-3 d-flex flex-column justify-content-center"
+            >
+              <div class="d-flex align-items-center mb-2">
+                <div
+                  class="rounded-circle bg-danger text-white icon-circle-sm me-2"
+                >
+                  <i class="fa-solid fa-arrow-down fs-xs"></i>
+                </div>
+                <small class="text-danger fw-semibold fs-xxs"
+                  >Despesas Totais</small
+                >
+              </div>
+              <h5 class="fw-bold text-dark m-0" id="totalDespesas">R$ 0,00</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="fw-bold m-0 text-dark">Centros de Custo</h6>
+          <a
+            href="javascript:void(0)"
+            id="btnLimparFiltro"
+            class="text-decoration-none text-success fs-xs d-none"
+          >
+            Limpar filtro <i class="fa-solid fa-xmark"></i>
+          </a>
+        </div>
+
+        <div
+          class="d-flex flex-nowrap overflow-auto gap-3 pb-2 horizontal-scroll-container"
+          id="containerCentros"
+        ></div>
+      </div>
+
+      <div class="mb-5 pb-5">
+        <div class="d-flex align-items-center mb-3">
+          <h6 class="fw-bold m-0 me-2 text-dark">Histórico Geral</h6>
+          <span
+            id="badgeFiltroAtual"
+            class="badge rounded-pill bg-success-subtle text-success border border-success px-3 d-none"
+          >
+          </span>
+        </div>
+
+        <div class="input-group mb-3 shadow-sm">
+          <span class="input-group-text bg-white border-end-0">
+            <i class="fa-solid fa-magnifying-glass text-muted"></i>
+          </span>
+          <input
+            type="text"
+            id="inputBusca"
+            class="form-control border-start-0 ps-0 search-input"
+            placeholder="Buscar..."
+          />
+          <button
+            class="btn btn-white border border-start-0 text-muted"
+            type="button"
+            id="btnLimparBusca"
+          >
+            Limpar
+          </button>
+        </div>
+
+        <div class="d-flex flex-column gap-2" id="listaTransacoes"></div>
+      </div>
+    </div>
+
+    <nav class="navbar fixed-bottom bg-white border-top shadow-lg">
+      <div
+        class="container-fluid d-flex justify-content-around text-center py-1"
+      >
+        <a href="index.html" class="bottom-nav-link text-secondary">
+          <i class="fa-solid fa-border-all fs-4"></i>
+          <div class="bottom-nav-label">Início</div>
+        </a>
+        <a href="#" class="bottom-nav-link text-success">
+          <i class="fa-solid fa-wallet fs-4"></i>
+          <div class="bottom-nav-label fw-bold">Custos</div>
+        </a>
+        <a href="#" class="bottom-nav-link text-secondary">
+          <i class="fa-regular fa-file-lines fs-4"></i>
+          <div class="bottom-nav-label">Notas</div>
+        </a>
+        <a href="#" class="bottom-nav-link text-secondary">
+          <i class="fa-regular fa-calendar fs-4"></i>
+          <div class="bottom-nav-label">Calendário</div>
+        </a>
+      </div>
+    </nav>
+
+    <div class="modal fade" id="modalRelatorio" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg p-2">
+          <div class="modal-header border-bottom-0 pb-0">
+            <h5 class="modal-title fw-bold d-flex align-items-center gap-2 fs-6">
+              <i class="fa-regular fa-file-lines text-success fs-5"></i>
+              Relatório de Custos
+            </h5>
+            <button type="button" class="btn-close fs-sm" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <div class="modal-body">
+            <div class="mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                  <label class="form-label fw-bold fs-xs text-dark m-0">Centros de Custo</label>
+                  <div class="form-check form-switch fs-xs m-0">
+                      <input class="form-check-input" type="checkbox" id="checkTodosCentros" checked>
+                      <label class="form-check-label text-muted" for="checkTodosCentros">Todos</label>
+                  </div>
+              </div>
+              <div class="d-flex gap-2 overflow-auto pb-2 scroll-hide" id="listaFiltroCentros"></div>
+            </div>
+
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label class="form-label fw-bold fs-xs text-dark mb-1">Data Inicial</label>
+                <input type="date" class="form-control fs-sm text-muted" id="relatorioDataInicio" style="box-shadow: none;">
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-bold fs-xs text-dark mb-1">Data Final</label>
+                <input type="date" class="form-control fs-sm text-muted" id="relatorioDataFim" style="box-shadow: none;">
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-bold fs-xs text-dark mb-1">Colaborador</label>
+              <select class="form-select fs-sm text-muted" id="relatorioColaborador" style="box-shadow: none;">
+                </select>
+            </div>
+
+            <div class="row g-2 mb-4">
+              <div class="col-7">
+                <label class="form-label fw-bold fs-xs text-dark mb-1">Formato de Saída</label>
+                <select class="form-select fs-sm text-muted" id="relatorioFormato" style="box-shadow: none;">
+                  <option value="pdf">Documento (PDF)</option>
+                  <option value="png" selected>Imagem (PNG)</option>
+                </select>
+              </div>
+              <div class="col-5 d-flex align-items-end pb-1">
+                <div class="form-check form-switch m-0">
+                  <input class="form-check-input cursor-pointer" type="checkbox" id="checkIncluirGrafico" checked>
+                  <label class="form-check-label fs-xs fw-bold text-dark cursor-pointer" for="checkIncluirGrafico">Com Gráfico</label>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-dark w-100 py-2 rounded-3 fw-bold" id="btnGerarRelatorio">
+              <i class="fa-solid fa-download me-2"></i> Baixar Relatório
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="modalNovaMovimentacao"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm rounded-4 px-2">
+          <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+            <div>
+              <h5 class="fw-bold m-0 text-dark">Nova Movimentação</h5>
+              <p class="text-muted fs-xs m-0">
+                Registre uma entrada ou saída financeira.
+              </p>
+            </div>
+            <button
+              type="button"
+              class="btn-close align-self-start"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+
+          <div class="modal-body px-4 py-4">
+            <form id="formMovimentacao">
+              <div class="d-flex gap-3 mb-4">
+                <button
+                  type="button"
+                  class="btn btn-tab-movimentacao btn-tab-entrada active w-50 d-flex flex-column align-items-center p-3"
+                  data-tipo="entrada"
+                >
+                  <i class="fa-solid fa-arrow-up mb-2 fs-5"></i>
+                  <span class="fw-bold fs-sm">Entrada</span>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-tab-movimentacao btn-tab-saida w-50 d-flex flex-column align-items-center p-3"
+                  data-tipo="saida"
+                >
+                  <i class="fa-solid fa-arrow-down mb-2 fs-5"></i>
+                  <span class="fw-bold fs-sm">Saída</span>
+                </button>
+                <input
+                  type="hidden"
+                  id="inputTipoMovimentacao"
+                  name="tipoMovimentacao"
+                  value="entrada"
+                />
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-bold fs-xs text-muted mb-1"
+                  >Valor</label
+                >
+                <div class="input-group">
+                  <span
+                    class="input-group-text bg-white border-end-0 text-muted fs-sm"
+                    >R$</span
+                  >
+                  <input
+                    type="number"
+                    class="form-control border-start-0 ps-0 fs-sm"
+                    placeholder="0,00"
+                    step="0.01"
+                    required
+                    id="inputValor"
+                    style="box-shadow: none"
+                  />
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-bold fs-xs text-muted mb-1"
+                  >Descrição</label
+                >
+                <input
+                  type="text"
+                  class="form-control fs-sm"
+                  placeholder="Ex: Venda de Soja"
+                  id="inputDescricao"
+                  required
+                />
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-6">
+                  <label class="form-label fw-bold fs-xs text-muted mb-1"
+                    >Data</label
+                  >
+                  <input
+                    type="date"
+                    class="form-control fs-sm"
+                    id="inputData"
+                    required
+                  />
+                </div>
+                <div class="col-6">
+                  <label class="form-label fw-bold fs-xs text-muted mb-1"
+                    >Pagamento</label
+                  >
+                  <select
+                    class="form-select fs-sm text-muted"
+                    id="selectPagamento"
+                  >
+                    <option selected>Selecione...</option>
+                    <option>Dinheiro</option>
+                    <option>Pix</option>
+                    <option>Cartão de Crédito</option>
+                    <option>Transferência Bancária</option>
+                    <option>Boleto</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-bold fs-xs text-muted mb-1"
+                  >Centro de Custo / Lucro</label
+                >
+                <div class="input-group">
+                  <span
+                    class="input-group-text bg-white border-end-0 text-muted"
+                  >
+                    <i class="fa-solid fa-layer-group fs-xs"></i>
+                  </span>
+                  <select
+                    class="form-select border-start-0 ps-0 fs-sm text-muted"
+                    id="selectCentroCusto"
+                    style="box-shadow: none"
+                  >
+                    <option value="" disabled selected>Selecione...</option>
+                  </select>
+                </div>
+              </div>
+
+              <div id="camposEntrada">
+                <div class="mb-4">
+                  <label class="form-label fw-bold fs-xs text-muted mb-1"
+                    >Quem pagou?</label
+                  >
+                  <div class="input-group">
+                    <span
+                      class="input-group-text bg-white border-end-0 text-muted"
+                    >
+                      <i class="fa-regular fa-user fs-xs"></i>
+                    </span>
+                    <input
+                      type="text"
+                      class="form-control border-start-0 ps-0 fs-sm"
+                      id="inputQuemPagou"
+                      placeholder="Ex: Cooperativa, Cliente Final..."
+                      style="box-shadow: none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div id="camposSaida" class="d-none">
+                <div class="mb-3">
+                  <label class="form-label fw-bold fs-xs text-muted mb-1"
+                    >Fornecedor</label
+                  >
+                  <div class="input-group">
+                    <span
+                      class="input-group-text bg-white border-end-0 text-muted"
+                    >
+                      <i class="fa-regular fa-user fs-xs"></i>
+                    </span>
+                    <input
+                      type="text"
+                      class="form-control border-start-0 ps-0 fs-sm"
+                      id="inputFornecedor"
+                      placeholder="Ex: AgroLoja, Mecânico..."
+                      style="box-shadow: none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                class="btn btn-success w-100 py-3 rounded-pill fw-bold fs-sm"
+                id="btnSubmitMovimentacao"
+              >
+                Registrar Entrada
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="modalDetalhes" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow rounded-4 p-3">
+          <div class="modal-body text-center pt-4">
+            <div
+              id="detalheIconeBg"
+              class="rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
+              style="width: 60px; height: 60px; background-color: #e7f7ed"
+            >
+              <i
+                id="detalheIcone"
+                class="fa-solid fa-arrow-up fs-3 text-success"
+              ></i>
+            </div>
+
+            <h3 class="fw-bold m-0 text-dark" id="detalheValor">R$ 0,00</h3>
+            <span
+              class="badge rounded-pill bg-success-subtle text-success px-3 py-1 mt-2 fs-xxs"
+              id="detalheTipoBadge"
+              >ENTRADA</span
+            >
+          </div>
+
+          <div class="px-3 py-3">
+            <div class="d-flex align-items-center gap-3 mb-4">
+              <div class="icon-circle-detail bg-light text-muted">
+                <i class="fa-regular fa-file-lines"></i>
+              </div>
+              <div>
+                <small class="text-muted d-block fs-xxs fw-bold"
+                  >DESCRIÇÃO</small
+                >
+                <span class="text-dark fw-semibold fs-sm" id="detalheDescricao"
+                  >...</span
+                >
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-3 mb-4">
+              <div class="icon-circle-detail bg-light text-muted">
+                <i class="fa-regular fa-calendar"></i>
+              </div>
+              <div>
+                <small class="text-muted d-block fs-xxs fw-bold">DATA</small>
+                <span class="text-dark fw-semibold fs-sm" id="detalheData"
+                  >...</span
+                >
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-3 mb-4">
+              <div class="icon-circle-detail bg-light text-muted">
+                <i class="fa-regular fa-credit-card"></i>
+              </div>
+              <div>
+                <small class="text-muted d-block fs-xxs fw-bold"
+                  >FORMA DE PAGAMENTO</small
+                >
+                <span class="text-dark fw-semibold fs-sm" id="detalhePagamento"
+                  >...</span
+                >
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-3 mb-4">
+              <div class="icon-circle-detail bg-light text-muted">
+                <i class="fa-solid fa-layer-group"></i>
+              </div>
+              <div>
+                <small class="text-muted d-block fs-xxs fw-bold"
+                  >CENTRO DE CUSTO</small
+                >
+                <span class="text-dark fw-semibold fs-sm" id="detalheCategoria"
+                  >...</span
+                >
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-3 mb-4">
+              <div class="icon-circle-detail bg-light text-muted">
+                <i class="fa-regular fa-user"></i>
+              </div>
+              <div>
+                <small
+                  class="text-muted d-block fs-xxs fw-bold"
+                  id="labelPessoa"
+                  >RESPONSÁVEL</small
+                >
+                <span class="text-dark fw-semibold fs-sm" id="detalhePessoa"
+                  >...</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="modal-footer border-top-0 px-2 pb-2 justify-content-between"
+          >
+            <button
+              type="button"
+              class="btn btn-light-blue w-45 fw-bold text-primary py-2 rounded-3"
+              id="btnEditarTransacao"
+            >
+              <i class="fa-solid fa-pen me-2"></i> Editar
+            </button>
+            <button
+              type="button"
+              class="btn btn-light-red w-45 fw-bold text-danger py-2 rounded-3"
+              id="btnExcluirTransacao"
+            >
+              <i class="fa-regular fa-trash-can me-2"></i> Excluir
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="modalNovoCentro"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow rounded-4">
+          <div class="text-center pt-3 pb-1">
+            <div
+              class="bg-secondary opacity-25 rounded-pill"
+              style="width: 40px; height: 4px; display: inline-block"
+            ></div>
+          </div>
+
+          <div class="modal-body px-4 pb-4 pt-2">
+  <h5 class="fw-bold mb-2">Novo Centro de Custo</h5>
+  <p class="text-muted fs-xs mb-4">
+    Crie uma nova categoria para organizar suas finanças.
+  </p>
+
+  <form id="formNovoCentro">
+    <label class="form-label fw-bold fs-xs text-dark">Tipo de Centro</label>
+    
+    <div class="row g-2 mb-3">
+      <div class="col-4">
+        <input type="radio" class="btn-check" name="tipoCentro" id="tipoLavoura" value="lavoura" checked onchange="UI.mudarTipoCentro('lavoura')"/>
+        <label class="card card-select h-100 d-flex flex-column align-items-center justify-content-center p-2 cursor-pointer" for="tipoLavoura">
+          <i class="fa-solid fa-seedling fs-4 mb-2"></i>
+          <span class="fs-xxs fw-bold text-center">Lavoura</span>
+        </label>
+      </div>
+
+      <div class="col-4">
+        <input type="radio" class="btn-check" name="tipoCentro" id="tipoMaquinas" value="maquinas" onchange="UI.mudarTipoCentro('maquinas')"/>
+        <label class="card card-select h-100 d-flex flex-column align-items-center justify-content-center p-2 cursor-pointer" for="tipoMaquinas">
+          <i class="fa-solid fa-tractor fs-4 mb-2"></i>
+          <span class="fs-xxs fw-bold text-center">Máquinas</span>
+        </label>
+      </div>
+
+      <div class="col-4">
+        <input type="radio" class="btn-check" name="tipoCentro" id="tipoGeral" value="geral" onchange="UI.mudarTipoCentro('geral')"/>
+        <label class="card card-select h-100 d-flex flex-column align-items-center justify-content-center p-2 cursor-pointer" for="tipoGeral">
+          <i class="fa-solid fa-building fs-4 mb-2"></i>
+          <span class="fs-xxs fw-bold text-center">Geral</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label fw-bold fs-xs text-dark">Nome / Apelido</label>
+      <input type="text" class="form-control fs-sm" id="inputNomeCentro" placeholder="Ex: Talhão do Rio" required />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label fw-bold fs-xs text-dark">Descrição</label>
+      <textarea class="form-control fs-sm" id="inputDescricaoCentro" rows="2" placeholder="Breve descrição para identificação..."></textarea>
+    </div>
+
+    <div id="camposLavoura">
+      <div class="row g-2 mb-3">
+        <div class="col-8">
+          <label class="form-label fw-bold fs-xs text-dark">Tamanho da Área</label>
+          <input type="number" class="form-control fs-sm" id="inputArea" placeholder="0.00" step="0.01">
+        </div>
+        <div class="col-4">
+          <label class="form-label fw-bold fs-xs text-dark">Unidade</label>
+          <select class="form-select fs-sm" id="inputUnidade">
+            <option value="ha">hectare</option>
+            <option value="alq">alqueire</option>
+          </select>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-bold fs-xs text-dark">Cultura Atual <span class="text-muted fw-normal">(Opcional)</span></label>
+        <input type="text" class="form-control fs-sm" id="inputCultura" placeholder="Ex: Soja">
+      </div>
+    </div>
+
+    <div id="camposMaquinas" class="d-none">
+      <div class="mb-3">
+        <label class="form-label fw-bold fs-xs text-dark">Modelo / Marca</label>
+        <input type="text" class="form-control fs-sm" id="inputModelo" placeholder="Ex: John Deere 5078E">
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-bold fs-xs text-dark">Ano de Aquisição</label>
+        <input type="number" class="form-control fs-sm" id="inputAno" placeholder="Ex: 2021">
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-bold fs-xs text-dark">Identificação <span class="text-muted fw-normal">(Opcional)</span></label>
+        <input type="text" class="form-control fs-sm" id="inputSerial" placeholder="Placa ou Nº de Série">
+      </div>
+    </div>
+
+    <div id="infoGeral" class="d-none mb-4">
+      <div class="alert alert-purple d-flex gap-3 p-3 rounded-3">
+        <i class="fa-solid fa-building text-purple fs-5 mt-1"></i>
+        <div>
+          <h6 class="fw-bold text-purple mb-1 fs-sm">Centro de Custo Geral</h6>
+          <p class="mb-0 fs-xs text-muted" style="line-height: 1.4;">
+            Utilize esta categoria para agrupar despesas que não estão diretamente ligadas a uma área produtiva ou veículo específico (ex: Contabilidade, Energia, Escritório).
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2">
+  <button type="button" class="btn btn-light w-50 py-2 rounded-3 fw-bold text-secondary border" data-bs-dismiss="modal">
+    Cancelar
+  </button>
+  
+  <button type="submit" id="btnCriarCentro" class="btn btn-success w-50 py-2 rounded-3 fw-bold transition-all">
+    <i class="fa-solid fa-check me-2"></i> Criar Centro de Custo
+  </button>
+</div>
+  </form>
+</div>
+        </div>
+      </div>
+    </div>
+    <div id="relatorioFantasma" style="position: absolute; left: -9999px; top: 0; width: 1050px; background: white; padding: 40px; z-index: -1;">
+        <h2 style="color: #0f5132; margin-bottom: 5px;">Relatório de Custos - Cultiva</h2>
+        <p id="rfSubtitulo" style="color: #666; font-size: 14px; margin-bottom: 20px;"></p>
+        
+        <div id="rfGraficosContainer" style="display: flex; justify-content: space-around; align-items: center; margin-bottom: 40px; display: none;">
+            <div style="width: 450px; height: 300px;">
+                <canvas id="canvasGraficoBarras"></canvas>
+            </div>
+            <div style="width: 450px; height: 300px;">
+                <canvas id="canvasGraficoPizza"></canvas>
+            </div>
+        </div>
+        
+        <div id="rfTabelaContainer"></div>
+    </div>
+  </body>
+</html>
