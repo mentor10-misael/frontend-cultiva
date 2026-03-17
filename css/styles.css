@@ -1,0 +1,251 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+  background-color: #ffffff;
+}
+
+/* CONTAINER PRINCIPAL */
+.login-container {
+  min-height: 100dvh;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 16px;
+}
+
+/* LOGO */
+#logo {
+  width: 200px;
+  margin-bottom: 20px;
+}
+
+/* TEXTO */
+.welcome-text {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.welcome-text p {
+  color: #6A7282;
+  margin-top: 8px;
+}
+
+/* FORM */
+.login-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* LABEL */
+label {
+  width: 100%;
+  max-width: 350px;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+/* INPUT GROUP */
+.input-group {
+  position: relative;
+  width: 100%;
+  max-width: 350px;
+  margin-bottom: 16px;
+}
+
+.input-group i {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 14px 14px 14px 44px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background-color: #f9FAFB;
+  font-size: 14px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.input-group input:focus {
+  background-color: #ffffff;
+  border-color: #00873c;
+}
+
+/* BOTÕES */
+.btn {
+  width: 100%;
+  max-width: 350px;
+  padding: 18px;
+  margin-bottom: 12px;
+  border-radius: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.btn-primary {
+  background-color: #008236;
+  color: #ffffff;
+}
+
+.btn-secondary {
+  background-color: #101828;
+  color: #ffffff;
+  text-decoration: none;
+  text-align: center;
+}
+
+/* CARDS */
+.profile-selection {
+  width: 100%;
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.profile-card {
+  flex: 1;
+  border: 2px solid #e0e6ed;
+  border-radius: 20px;
+  padding: 16px 8px;
+  text-align: center;
+}
+
+.profile-card p {
+  font-size: 11px;
+  color: #8898aa;
+  margin-top: 6px;
+}
+
+/* FOOTER */
+.footer {
+  margin: 20px 0;
+  font-size: 12px;
+  color: #8898aa;
+}
+
+.modal-terms{
+
+  background-color: #ffffff;
+  border-radius: 20px;
+box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.05);
+  
+  padding: 20px;
+  width: 100%;
+  text-align: center;
+}
+
+.modal-terms a{
+  color: #008236;
+}
+
+#logo-criar-conta{
+  width: 100%;
+}
+
+/* MODAL */
+
+/* Modal Cultiva */
+.modal-cultiva {
+  border-radius: 20px;
+  padding: 30px 25px;
+  position: relative;
+}
+
+.btn-close-custom {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.modal-icon {
+  width: 48px;
+  height: 48px;
+  background: #e6f4ea;
+  color: #0f7b3d;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 15px;
+  font-size: 20px;
+}
+
+.modal-body h2 {
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #6c757d;
+  margin-bottom: 20px;
+}
+
+/* Inputs */
+.form-cultiva {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-cultiva {
+  display: flex;
+  align-items: center;
+  background: #f5f6f7;
+  border-radius: 12px;
+  padding: 12px 15px;
+}
+
+.input-cultiva i {
+  color: #9ca3af;
+  margin-right: 10px;
+}
+
+.input-cultiva input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+}
+
+/* Botão */
+.btn-cultiva {
+  margin-top: 15px;
+  border-radius: 12px;
+  padding: 12px;
+  font-weight: 600;
+}
+
+/* Termos */
+.terms {
+  display: block;
+  margin-top: 15px;
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.terms a {
+  color: #198754;
+  text-decoration: none;
+}
